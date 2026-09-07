@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Invited — Join Our Private Telegram Circle</title>
+<meta name="description" content="Something big is happening inside. Get access before doors close.">
+<style>
+  :root{
+    --bg:#0a0f16;
+    --bg-2:#0e1621;
+    --surface:#141f2b;
+    --surface-2:#1a2735;
+    --surface-3:#21303f;
+    --text:#eaf0f6;
+    --text-dim:#7c8ea0;
+    --text-mid:#aebfcd;
+    --accent:#229ED9;
+    --accent-light:#5cc4ee;
+    --accent-glow:rgba(34,158,217,0.15);
+    --gold:#e8a838;
+    --gold-dim:rgba(232,168,56,0.12);
+    --border:rgba(255,255,255,0.07);
+    --border-strong:rgba(255,255,255,0.12);
+    --success:#2ecc71;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(ellipse at top, rgba(34,158,217,0.08), transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(34,158,217,0.05), transparent 60%);
+    background-attachment:fixed;
+  }
+  .container{max-width:680px;margin:0 auto;padding:0 24px}
+
+  /* HERO */
+  .hero{
+    text-align:center;
+    padding:56px 0 40px;
+    animation:fadeUp .7s ease both;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  .hero-badge{
+    display:inline-block;
+    background:var(--accent-glow);
+    color:var(--accent-light);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    padding:6px 16px;
+    border-radius:99px;
+    border:1px solid rgba(34,158,217,0.25);
+    margin-bottom:24px;
+  }
+  .tg-logo{
+    width:84px;height:84px;
+    margin:0 auto 28px;
+    background:linear-gradient(135deg,var(--accent),#1c7bb0);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 12px 36px rgba(34,158,217,0.3);
+  }
+  .tg-logo svg{width:44px;height:44px;fill:#fff}
+  .hero h1{
+    font-size:34px;
+    font-weight:800;
+    line-height:1.2;
+    letter-spacing:-1px;
+    margin-bottom:16px;
+  }
+  .hero h1 .highlight{color:var(--accent-light)}
+  .hero .sub{
+    font-size:17px;
+    color:var(--text-mid);
+    max-width:520px;
+    margin:0 auto 8px;
+    line-height:1.65;
+  }
+  .hero .curiosity{
+    font-size:15px;
+    color:var(--text-dim);
+    margin-top:12px;
+    font-style:italic;
+  }
+
+  /* SECTIONS */
+  .section{
+    padding:36px 0;
+    border-top:1px solid var(--border);
+  }
+  .section-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section-label::before{
+    content:"";width:24px;height:2px;background:var(--accent);border-radius:2px;
+  }
+  .section h2{
+    font-size:24px;
+    font-weight:700;
+    letter-spacing:-0.5px;
+    margin-bottom:14px;
+    line-height:1.3;
+  }
+  .section p{
+    color:var(--text-mid);
+    font-size:16px;
+    line-height:1.7;
+    margin-bottom:14px;
+  }
+  .section p:last-child{margin-bottom:0}
+
+  /* FEATURE LIST */
+  .features{
+    display:grid;
+    gap:14px;
+    margin-top:24px;
+  }
+  .feature{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px 22px;
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    transition:border-color .2s,transform .15s;
+  }
+  .feature:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+  .feature-icon{
+    flex-shrink:0;
+    width:40px;height:40px;
+    background:var(--accent-glow);
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+  }
+  .feature-icon svg{width:20px;height:20px;fill:var(--accent-light)}
+  .feature h3{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .feature p{
+    font-size:14px;
+    color:var(--text-dim);
+    margin:0;
+    line-height:1.55;
+  }
+
+  /* STATS */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin:28px 0;
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 12px;
+    text-align:center;
+  }
+  .stat-num{
+    font-size:28px;
+    font-weight:800;
+    color:var(--accent-light);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+  }
+  .stat-label{
+    font-size:11px;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-top:8px;
+  }
+
+  /* CTA BLOCK */
+  .cta-block{
+    background:linear-gradient(160deg,var(--surface),var(--surface-2));
+    border:1px solid var(--border-strong);
+    border-radius:24px;
+    padding:44px 32px;
+    text-align:center;
+    margin:40px 0 32px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+  .cta-block h2{
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:10px;
+    letter-spacing:-0.5px;
+  }
+  .cta-block .cta-sub{
+    color:var(--text-mid);
+    font-size:15px;
+    margin-bottom:28px;
+  }
+  .countdown-wrap{
+    margin:8px 0 20px;
+  }
+  .countdown{
+    font-size:72px;
+    font-weight:900;
+    color:var(--accent-light);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+    letter-spacing:-3px;
+    text-shadow:0 0 40px rgba(34,158,217,0.3);
+  }
+  .countdown-label{
+    margin-top:6px;
+    color:var(--text-dim);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+  }
+  .progress{
+    height:8px;
+    background:var(--surface-3);
+    border-radius:99px;
+    overflow:hidden;
+    margin:20px 0 24px;
+  }
+  .progress-bar{
+    height:100%;
+    width:100%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-light));
+    border-radius:99px;
+  }
+  .join-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    background:linear-gradient(135deg,var(--accent),#1c7bb0);
+    color:#fff;
+    text-decoration:none;
+    font-weight:700;
+    font-size:18px;
+    padding:16px 36px;
+    border-radius:16px;
+    transition:transform .12s,box-shadow .2s;
+    box-shadow:0 8px 24px rgba(34,158,217,0.3);
+  }
+  .join-btn:hover{box-shadow:0 12px 32px rgba(34,158,217,0.45)}
+  .join-btn:active{transform:scale(0.97)}
+  .hero-cta{
+    margin-top:32px;
+  }
+  .hero-countdown{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:8px;
+    margin-top:18px;
+    font-size:14px;
+    color:var(--text-dim);
+  }
+  .hero-countdown strong{
+    color:var(--accent-light);
+    font-size:20px;
+    font-variant-numeric:tabular-nums;
+    font-weight:800;
+  }
+  .sticky-join{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:rgba(10,15,22,0.92);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-top:1px solid var(--border-strong);
+    padding:12px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    z-index:100;
+    transform:translateY(100%);
+    transition:transform .35s ease;
+  }
+  .sticky-join.show{transform:translateY(0)}
+  .sticky-join .join-btn{flex:1;max-width:420px;justify-content:center}
+  .sticky-join .sticky-timer{
+    font-size:13px;
+    color:var(--text-dim);
+    white-space:nowrap;
+    min-width:70px;
+  }
+  .sticky-join .sticky-timer strong{color:var(--accent-light);font-weight:800}
+  .join-btn svg{width:22px;height:22px;fill:#fff}
+  .redirecting{
+    font-size:14px;
+    color:var(--text-dim);
+    margin-top:18px;
+    min-height:20px;
+  }
+  .spinner{
+    display:inline-block;
+    width:13px;height:13px;
+    border:2px solid var(--text-dim);
+    border-top-color:transparent;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:-2px;
+    margin-right:7px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* FOMO */
+  .fomo{
+    text-align:center;
+    padding:20px 0 0;
+    font-size:13px;
+    color:var(--text-dim);
+  }
+  .fomo .live-dot{
+    display:inline-block;
+    width:8px;height:8px;
+    background:var(--success);
+    border-radius:50%;
+    margin-right:6px;
+    animation:pulse 1.5s ease infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* FOOTER */
+  .footer{
+    text-align:center;
+    padding:40px 0 100px;
+    border-top:1px solid var(--border);
+    font-size:13px;
+    color:var(--text-dim);
+    line-height:1.6;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width:520px){
+    .hero{padding:28px 0 20px}
+    .hero h1{font-size:22px}
+    .hero .sub{font-size:14px;margin-bottom:6px}
+    .hero .curiosity{font-size:13px}
+    .tg-logo{width:64px;height:64px;margin-bottom:18px}
+    .tg-logo svg{width:34px;height:34px}
+    .hero-badge{font-size:11px;padding:5px 12px;margin-bottom:16px}
+    .hero-cta{margin-top:22px}
+    .join-btn{font-size:15px;padding:14px 24px}
+    .section h2{font-size:20px}
+    .cta-block{padding:32px 20px}
+    .countdown{font-size:56px}
+    .stats{grid-template-columns:1fr}
+    .container{padding:0 18px}
+    .sticky-join .sticky-timer{display:none}
+    .sticky-join .join-btn{font-size:16px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <span class="hero-badge">Private Invite Only</span>
+      <div class="tg-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M21.94 4.3 18.6 20.04c-.25 1.1-.92 1.37-1.86.85l-5.15-3.8-2.48 2.39c-.27.27-.5.5-1.03.5l.37-5.24 9.55-8.64c.42-.37-.09-.58-.65-.21L5.12 13.18.99 11.9c-.9-.28-.92-.9.19-1.34l17.7-6.82c.75-.27 1.4.18 1.16 1.36z"/></svg>
+      </div>
+      <h1>You're <span class="highlight">One Step Away</span><br>From Something Big</h1>
+      <p class="sub">We've been quietly building something behind closed doors. People are already inside — and they're not looking back. Now it's your turn to see what the buzz is about.</p>
+      <p class="curiosity">Most people who join wish they had found it sooner.</p>
+
+      <div class="hero-cta">
+        <a class="join-btn" href="https://t.me/+RibGnKQct1JlOGNl" rel="nofollow">
+          <svg viewBox="0 0 24 24"><path d="M21.94 4.3 18.6 20.04c-.25 1.1-.92 1.37-1.86.85l-5.15-3.8-2.48 2.39c-.27.27-.5.5-1.03.5l.37-5.24 9.55-8.64c.42-.37-.09-.58-.65-.21L5.12 13.18.99 11.9c-.9-.28-.92-.9.19-1.34l17.7-6.82c.75-.27 1.4.18 1.16 1.36z"/></svg>
+          Join Telegram Now
+        </a>
+        <div class="hero-countdown">Auto-redirect in <strong id="heroCountdown">4s</strong></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>This Isn't Just Another Channel</h2>
+      <p>Forget the noise, the spam, and the recycled content you see everywhere else. What we share inside our Telegram circle is different — and it's the reason people stay.</p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          </div>
+          <div>
+            <h3>Real-Time Updates First</h3>
+            <p>Everything hits our Telegram before it goes anywhere else. You'll always be the first to know.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V5l-8-3zm-1 17-3-3 1.4-1.4L11 16.2l4.6-4.6L17 13l-6 6z"/></svg>
+          </div>
+          <div>
+            <h3>Exclusive Content You Won't Find Publicly</h3>
+            <p>From insider tips to resources we never post publicly — this is the stuff that stays inside the circle.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </div>
+          <div>
+            <h3>A Community That Actually Shows Up</h3>
+            <p>You're not joining a dead broadcast list. Real people, real conversations, real value — every single day.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93C7.05 19.44 4 16.08 4 12c0-.61.08-1.21.21-1.78L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41C17.93 5.78 20 8.65 20 12c0 2.08-.81 3.98-2.1 5.39z"/></svg>
+          </div>
+          <div>
+            <h3>No Fluff, No Spam, No Nonsense</h3>
+            <p>We respect your attention. Every message we send has a purpose. If it doesn't bring value, it doesn't go out.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">By The Numbers</div>
+      <h2>A Circle That's Growing Fast</h2>
+      <p>You're not early anymore — but you're definitely not too late. Here's what's happening inside right now:</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num" id="statMembers">2,800+</div>
+          <div class="stat-label">Members</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">Daily</div>
+          <div class="stat-label">Fresh Drops</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">4.9★</div>
+          <div class="stat-label">Member Rating</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY TELEGRAM -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Why Telegram?</div>
+      <h2>Because That's Where The Magic Happens</h2>
+      <p>We chose Telegram for a reason. It's fast, private, and doesn't algorithm-decide what you see. When we post something, you see it — instantly. No fighting with a feed, no buried posts, no missed updates.</p>
+      <p>And once you're in, you'll understand why so many people never leave.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="border-top:none">
+    <div class="container">
+      <div class="cta-block">
+        <div class="section-label" style="justify-content:center">Your Access Is Ready</div>
+        <h2>Ready To See What's Inside?</h2>
+        <p class="cta-sub">Hold tight — we're taking you to Telegram in just a moment. Or tap the button below to jump in now.</p>
+
+        <div class="countdown-wrap">
+          <div class="countdown" id="countdown">4</div>
+          <div class="countdown-label">seconds until auto-redirect</div>
+        </div>
+
+        <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+        <a class="join-btn" id="joinBtn" href="https://t.me/+RibGnKQct1JlOGNl" rel="nofollow">
+          <svg viewBox="0 0 24 24"><path d="M21.94 4.3 18.6 20.04c-.25 1.1-.92 1.37-1.86.85l-5.15-3.8-2.48 2.39c-.27.27-.5.5-1.03.5l.37-5.24 9.55-8.64c.42-.37-.09-.58-.65-.21L5.12 13.18.99 11.9c-.9-.28-.92-.9.19-1.34l17.7-6.82c.75-.27 1.4.18 1.16 1.36z"/></svg>
+          Join Telegram Now
+        </a>
+
+        <div class="redirecting" id="status"></div>
+      </div>
+
+      <div class="fomo">
+        <span class="live-dot"></span>
+        <span id="liveText">42 people joined in the last hour</span>
+      </div>
+    </div>
+  </section>
+
+<!-- Sticky bottom Join bar (appears on scroll) -->
+<div class="sticky-join" id="stickyJoin">
+  <span class="sticky-timer">Redirect in <strong id="stickyTimer">4s</strong></span>
+  <a class="join-btn" href="https://t.me/+RibGnKQct1JlOGNl" rel="nofollow">
+    <svg viewBox="0 0 24 24"><path d="M21.94 4.3 18.6 20.04c-.25 1.1-.92 1.37-1.86.85l-5.15-3.8-2.48 2.39c-.27.27-.5.5-1.03.5l.37-5.24 9.55-8.64c.42-.37-.09-.58-.65-.21L5.12 13.18.99 11.9c-.9-.28-.92-.9.19-1.34l17.7-6.82c.75-.27 1.4.18 1.16 1.36z"/></svg>
+    Join Now
+  </a>
+</div>
+
+<footer class="footer">
+    <div class="container">
+      This page was created to bring you to our Telegram community.<br>
+      By joining, you agree to receive messages via Telegram. You can leave anytime.
+    </div>
+  </footer>
+
+<script>
+  var TELEGRAM_URL = "https://t.me/+RibGnKQct1JlOGNl";
+  var COUNTDOWN_SECONDS = 4;
+  var btn = document.getElementById('joinBtn');
+  var statusEl = document.getElementById('status');
+  var countdownEl = document.getElementById('countdown');
+  var progressBar = document.getElementById('progressBar');
+
+  function redirectToTelegram(){
+    statusEl.innerHTML = '<span class="spinner"></span>Taking you to Telegram...';
+    setTimeout(function(){
+      window.location.href = TELEGRAM_URL;
+    }, 400);
+  }
+
+  // Progress bar shrink
+  progressBar.style.transition = 'width ' + COUNTDOWN_SECONDS + 's linear';
+  void progressBar.offsetWidth;
+  progressBar.style.width = '0%';
+
+  var remaining = COUNTDOWN_SECONDS;
+  countdownEl.textContent = remaining;
+  var heroCd = document.getElementById('heroCountdown');
+  var stickyTimer = document.getElementById('stickyTimer');
+
+  // Show sticky bar after user scrolls past hero
+  var stickyBar = document.getElementById('stickyJoin');
+  function checkScroll(){
+    if(window.scrollY > 300){
+      stickyBar.classList.add('show');
+    } else {
+      stickyBar.classList.remove('show');
+    }
+  }
+  window.addEventListener('scroll', checkScroll, {passive:true});
+  checkScroll();
+
+  function updateTimers(){
+    if(heroCd) heroCd.textContent = remaining + 's';
+    if(stickyTimer) stickyTimer.textContent = remaining + 's';
+  }
+  updateTimers();
+
+  var tickInterval = setInterval(function(){
+    remaining--;
+    if(remaining <= 0){
+      countdownEl.textContent = '0';
+      if(heroCd) heroCd.textContent = '0s';
+      if(stickyTimer) stickyTimer.textContent = '0s';
+      clearInterval(tickInterval);
+      redirectToTelegram();
+    } else {
+      countdownEl.textContent = remaining;
+      updateTimers();
+    }
+  }, 1000);
+
+  // Live FOMO counter — randomises a bit to feel real
+  var liveText = document.getElementById('liveText');
+  var baseCount = 38 + Math.floor(Math.random() * 12);
+  liveText.textContent = baseCount + ' people joined in the last hour';
+  setInterval(function(){
+    baseCount += Math.floor(Math.random() * 3);
+    liveText.textContent = baseCount + ' people joined in the last hour';
+  }, 8000);
+
+  // Animate member count up
+  var statMembers = document.getElementById('statMembers');
+  var memberBase = 2700;
+  var memberTarget = 2800 + Math.floor(Math.random() * 80);
+  var current = memberBase;
+  var memberInterval = setInterval(function(){
+    current += Math.ceil((memberTarget - current) / 10);
+    if(current >= memberTarget){
+      current = memberTarget;
+      clearInterval(memberInterval);
+    }
+    statMembers.textContent = current.toLocaleString() + '+';
+  }, 60);
+</script>
+</body>
+</html>
