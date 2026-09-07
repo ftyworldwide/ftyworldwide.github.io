@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>You're Invited — Join Our Private Telegram Circle</title>
 <meta name="description" content="Something big is happening inside. Get access before doors close.">
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '3204600283078235');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=3204600283078235&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
 <style>
   :root{
     --bg:#0a0f16;
@@ -529,8 +548,21 @@
   var countdownEl = document.getElementById('countdown');
   var progressBar = document.getElementById('progressBar');
 
+  // Track all Join button clicks with Meta Pixel
+  document.querySelectorAll('.join-btn').forEach(function(el){
+    el.addEventListener('click', function(){
+      if(typeof fbq === 'function'){
+        fbq('track', 'Lead', {content_name: 'Telegram Join Button'});
+        fbq('trackCustom', 'JoinClick', {button_location: el.closest('.hero') ? 'hero' : el.closest('.sticky-join') ? 'sticky' : 'cta'});
+      }
+    });
+  });
+
   function redirectToTelegram(){
     statusEl.innerHTML = '<span class="spinner"></span>Taking you to Telegram...';
+    if(typeof fbq === 'function'){
+      fbq('track', 'InitiateCheckout', {content_name: 'Telegram Redirect'});
+    }
     setTimeout(function(){
       window.location.href = TELEGRAM_URL;
     }, 400);
