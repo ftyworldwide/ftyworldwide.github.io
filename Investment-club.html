@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FTY INVESTMENT CLUB</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#111936; --card:#16213e; --card2:#1c2a4d;
+  --accent:#5b8cff; --accent2:#7c5cff; --gold:#ffc24b;
+  --green:#22c55e; --red:#ef4444; --amber:#f59e0b;
+  --txt:#e8ecf6; --muted:#9aa6c4;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,Arial,sans-serif}
+body{background:radial-gradient(1200px 600px at 80% -10%,#1a2b5e 0%,transparent 60%),var(--bg);color:var(--txt);min-height:100vh;padding:20px}
+.wrap{max-width:920px;margin:0 auto}
+
+/* header */
+header{text-align:center;padding:28px 16px 8px}
+.logo{display:inline-flex;align-items:center;gap:12px;justify-content:center}
+.logo .mark{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;color:#fff;box-shadow:0 8px 24px rgba(91,140,255,.4)}
+.logo h1{font-size:30px;letter-spacing:1px;background:linear-gradient(90deg,#fff,#cdd8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{color:var(--muted);font-size:14px;margin-top:8px}
+.preview{margin-top:14px;display:inline-block;background:rgba(91,140,255,.12);border:1px solid rgba(91,140,255,.3);
+  color:#cdd8ff;padding:6px 14px;border-radius:999px;font-size:13px}
+
+/* search */
+.search-card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid #243456;border-radius:20px;
+  padding:24px;margin-top:22px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.search-card label{font-size:13px;color:var(--muted);display:block;margin-bottom:8px}
+.field{display:flex;gap:10px}
+.field input{flex:1;background:#0e1730;border:1px solid #2a3a5e;color:var(--txt);border-radius:12px;padding:14px 16px;font-size:16px;outline:none;transition:.2s}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,140,255,.18)}
+.btn{cursor:pointer;border:none;border-radius:12px;padding:14px 22px;font-size:15px;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));transition:transform .15s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(124,92,255,.45)}
+.btn.ghost{background:transparent;border:1px solid #2a3a5e;color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* result */
+.result{display:none;margin-top:20px}
+.result.show{display:block;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid #243456;border-radius:20px;padding:26px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.status-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.5px}
+.badge.active{background:rgba(34,197,94,.15);color:#7ef0a3;border:1px solid rgba(34,197,94,.4)}
+.badge.soon{background:rgba(245,158,11,.15);color:#ffcf7a;border:1px solid rgba(245,158,11,.4)}
+.badge.due{background:rgba(239,68,68,.15);color:#ff9b9b;border:1px solid rgba(239,68,68,.4)}
+.member{font-size:22px;font-weight:700;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:20px}
+.stat{background:#0e1730;border:1px solid #243456;border-radius:14px;padding:16px}
+.stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stat .v{font-size:18px;font-weight:700;margin-top:6px}
+.ring-wrap{display:flex;align-items:center;gap:18px;margin-top:8px}
+.ring{width:84px;height:84px;flex:none}
+
+/* upgrade */
+.upgrade{margin-top:22px}
+.upgrade h3{font-size:17px;margin-bottom:4px}
+.upgrade p.sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.plan{background:#0e1730;border:1px solid #2a3a5e;border-radius:16px;padding:18px;position:relative;transition:.2s;cursor:pointer}
+.plan:hover{border-color:var(--accent);transform:translateY(-3px)}
+.plan.pop{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.pop-tag{position:absolute;top:-10px;right:12px;background:var(--gold);color:#1a1300;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+.plan .pl-name{font-size:16px;font-weight:700}
+.pl-disc{display:inline-block;background:rgba(34,197,94,.15);color:#7ef0a3;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-top:6px}
+.plan .pl-old{font-size:13px;color:var(--muted);text-decoration:line-through;margin-top:4px}
+.plan .pl-price{font-size:26px;font-weight:800;margin-top:2px;color:var(--gold)}
+.plan .pl-price small{font-size:13px;font-weight:500;color:var(--muted)}
+.plan .pl-days{font-size:13px;color:var(--muted);margin-top:4px}
+.plan .pl-cta{margin-top:12px;text-align:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:10px;padding:9px;font-size:14px;font-weight:600}
+.plan.pop .pl-cta{background:linear-gradient(135deg,var(--gold),#ff9d3a);color:#1a1300}
+
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);
+  background:#1c2a4d;border:1px solid var(--accent);color:#fff;padding:12px 22px;border-radius:12px;
+  transition:transform .3s;z-index:50;font-size:14px}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:520px){.member{font-size:18px}.field{flex-direction:column}.danger-banner{flex-direction:column}}
+.danger-banner{display:flex;gap:14px;background:linear-gradient(135deg,rgba(239,68,68,.18),rgba(239,68,68,.08));border:1px solid rgba(239,68,68,.45);border-left:4px solid var(--red);border-radius:14px;padding:16px 18px;margin-bottom:18px;animation:pulseRed 2s infinite}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+.danger-banner.amber{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.08));border-color:rgba(245,158,11,.45);border-left-color:var(--amber);animation:pulseAmber 2s infinite}
+@keyframes pulseAmber{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.3)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+.danger-banner .db-icon{font-size:28px;flex:none}
+.danger-banner .db-title{font-size:16px;font-weight:800;color:#ff9b9b;margin-bottom:6px}
+.danger-banner.amber .db-title{color:#ffcf7a}
+.danger-banner .db-text{font-size:13px;color:#ffd0d0;line-height:1.7}
+.danger-banner.amber .db-text{color:#ffe6c0}
+.danger-banner .db-warn{margin-top:8px;font-size:13px;font-weight:600;color:#ff9b9b;background:rgba(239,68,68,.12);border-radius:8px;padding:8px 10px}
+.danger-banner.amber .db-warn{color:#ffcf7a;background:rgba(245,158,11,.12)}
+.demat-box{margin-top:20px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(124,92,255,.08));border:1px solid rgba(34,197,94,.3);border-left:4px solid var(--green);border-radius:16px;padding:20px}
+.demat-head{display:flex;gap:14px;align-items:flex-start}
+.demat-emoji{font-size:32px;flex:none}
+.demat-title{font-size:17px;font-weight:800;color:#7ef0a3;margin-bottom:4px}
+.demat-sub{font-size:13px;color:var(--muted);line-height:1.5}
+.demat-benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:16px}
+.db-item{font-size:13px;color:#cdd8ff;background:rgba(0,0,0,.15);border-radius:8px;padding:8px 10px}
+.db-item .lt{color:#7ef0a3;font-weight:600;font-size:11px}
+.demat-btn{margin-top:16px;width:100%;cursor:pointer;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;color:#0b1020;background:linear-gradient(135deg,var(--green),#16a34a);transition:transform .15s,box-shadow .2s}
+.demat-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(34,197,94,.4)}
+.contact-box{margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:12px 16px}
+.cb-icon{font-size:20px}
+.cb-text{font-size:13px;color:var(--muted);flex:1;min-width:200px}
+.wa-btn{cursor:pointer;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#25d366,#1da851);transition:transform .15s,box-shadow .2s;white-space:nowrap}
+.wa-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,211,102,.4)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <div class="mark">F</div>
+      <h1>FTY INVESTMENT CLUB</h1>
+    </div>
+    <div class="tag">Premium Subscription & Investment Membership Portal</div>
+    <div class="preview">CHECK SUBSCRIPTION</div>
+  </header>
+
+  <div class="search-card">
+    <label>Enter your registered mobile number to check subscription</label>
+    <div class="field">
+      <input id="searchInput" type="tel" inputmode="numeric" placeholder="e.g. 9443130195" autocomplete="off"/>
+      <button class="btn" onclick="check()">Check</button>
+    </div>
+    <div class="contact-box">
+      <span class="cb-icon">💬</span>
+      <div class="cb-text">Facing any issue? Contact us on WhatsApp: <b>8054393976</b></div>
+      <button class="wa-btn" onclick="contactWA()">Message on WhatsApp →</button>
+    </div>
+  </div>
+
+  <div id="result" class="result"></div>
+  <footer>© FTY Investment Club · For demo use. Subscription data as per club records.</footer>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const DATA = [{"name": "9443130195", "join": "20 Jun 2026", "subs": 365, "due": "20 Jun 2027", "status": "ACTIVE", "left": 286}, {"name": "9167277068", "join": "19 Jun 2026", "subs": 365, "due": "19 Jun 2027", "status": "ACTIVE", "left": 285}, {"name": "9557433585", "join": "09 Jul 2026", "subs": 90, "due": "07 Oct 2026", "status": "ACTIVE", "left": 30}, {"name": "9820488853", "join": "24 Jun 2026", "subs": 180, "due": "21 Dec 2026", "status": "ACTIVE", "left": 105}, {"name": "7276566042", "join": "14 Jul 2026", "subs": 30, "due": "13 Aug 2026", "status": "EXPIRED", "left": -25}, {"name": "9415522477", "join": "14 Jul 2026", "subs": 30, "due": "13 Aug 2026", "status": "EXPIRED", "left": -25}, {"name": "9886073285", "join": "09 Nov 2025", "subs": 365, "due": "09 Nov 2026", "status": "ACTIVE", "left": 63}, {"name": "7666130499", "join": "23 May 2026", "subs": 365, "due": "23 May 2027", "status": "ACTIVE", "left": 258}, {"name": "9765400855", "join": "11 Nov 2025", "subs": 30, "due": "11 Dec 2025", "status": "EXPIRED", "left": -270}, {"name": "9714768673", "join": "20 May 2026", "subs": 30, "due": "19 Jun 2026", "status": "EXPIRED", "left": -80}, {"name": "7558622802", "join": "13 Jul 2026", "subs": 30, "due": "12 Aug 2026", "status": "EXPIRED", "left": -26}, {"name": "9819114060", "join": "12 Jul 2026", "subs": 365, "due": "12 Jul 2027", "status": "ACTIVE", "left": 308}, {"name": "9663507162", "join": "09 Jul 2026", "subs": 93, "due": "10 Oct 2026", "status": "ACTIVE", "left": 33}, {"name": "9137917687", "join": "10 Aug 2026", "subs": 105, "due": "23 Nov 2026", "status": "ACTIVE", "left": 77}, {"name": "7977219497", "join": "06 Jul 2026", "subs": 365, "due": "06 Jul 2027", "status": "ACTIVE", "left": 302}, {"name": "9717567568", "join": "04 Jul 2026", "subs": 30, "due": "03 Aug 2026", "status": "EXPIRED", "left": -35}, {"name": "9539513479", "join": "11 Aug 2026", "subs": 30, "due": "10 Sep 2026", "status": "ACTIVE", "left": 3}, {"name": "7275119097", "join": "29 Jul 2026", "subs": 42, "due": "09 Sep 2026", "status": "ACTIVE", "left": 2}, {"name": "61433506405", "join": "02 Jul 2026", "subs": 30, "due": "01 Aug 2026", "status": "EXPIRED", "left": -37}, {"name": "7550189419", "join": "30 Jun 2026", "subs": 365, "due": "30 Jun 2027", "status": "ACTIVE", "left": 296}, {"name": "9545946054", "join": "24 Jun 2026", "subs": 90, "due": "22 Sep 2026", "status": "ACTIVE", "left": 15}, {"name": "9462907469", "join": "14 Jul 2026", "subs": 30, "due": "13 Aug 2026", "status": "EXPIRED", "left": -25}, {"name": "7263871448", "join": "17 Jul 2026", "subs": 365, "due": "17 Jul 2027", "status": "ACTIVE", "left": 313}, {"name": "8130737474", "join": "28 Jul 2026", "subs": 377, "due": "09 Aug 2027", "status": "ACTIVE", "left": 336}, {"name": "9686704094", "join": "30 Jul 2026", "subs": 365, "due": "30 Jul 2027", "status": "ACTIVE", "left": 326}, {"name": "8660892348", "join": "31 Jul 2026", "subs": 365, "due": "31 Jul 2027", "status": "ACTIVE", "left": 327}, {"name": "9582506164", "join": "03 Aug 2026", "subs": 30, "due": "02 Sep 2026", "status": "EXPIRED", "left": -5}, {"name": "7639663166", "join": "03 Aug 2026", "subs": 365, "due": "03 Aug 2027", "status": "ACTIVE", "left": 330}, {"name": "8074223991", "join": "06 Aug 2026", "subs": 30, "due": "05 Sep 2026", "status": "EXPIRED", "left": -2}, {"name": "6263955784", "join": "17 Jul 2026", "subs": 42, "due": "28 Aug 2026", "status": "EXPIRED", "left": -10}, {"name": "8277670414", "join": "17 Jul 2026", "subs": 377, "due": "29 Jul 2027", "status": "ACTIVE", "left": 325}, {"name": "7035632694", "join": "17 Jul 2026", "subs": 30, "due": "16 Aug 2026", "status": "EXPIRED", "left": -22}, {"name": "7503111924", "join": "21 Jul 2026", "subs": 365, "due": "21 Jul 2027", "status": "ACTIVE", "left": 317}, {"name": "9944511723", "join": "05 Aug 2026", "subs": 365, "due": "05 Aug 2027", "status": "ACTIVE", "left": 332}, {"name": "8928153578", "join": "05 Aug 2026", "subs": 365, "due": "05 Aug 2027", "status": "ACTIVE", "left": 332}, {"name": "9547540698", "join": "06 Aug 2026", "subs": 365, "due": "06 Aug 2027", "status": "ACTIVE", "left": 333}, {"name": "7703021147", "join": "10 Aug 2026", "subs": 30, "due": "09 Sep 2026", "status": "ACTIVE", "left": 2}, {"name": "6354572968", "join": "14 Aug 2026", "subs": 365, "due": "14 Aug 2027", "status": "ACTIVE", "left": 341}, {"name": "8006311218", "join": "15 Aug 2026", "subs": 365, "due": "15 Aug 2027", "status": "ACTIVE", "left": 342}, {"name": "8600957873", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9990737474", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7003674617", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "919975900325", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7066304719", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9930281861", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "6377988594", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9677261260", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9784416262", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7008337132", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9619052625", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7089652159", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "8828232595", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9133857210", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7396687350", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "6201708462", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "8210070835", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9941161231", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9667093324", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "6354313934", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "8792869927", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7206185135", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "7987197827", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "8169873326", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9354932132", "join": "29 Jul 2026", "subs": 30, "due": "28 Aug 2026", "status": "EXPIRED", "left": -9}, {"name": "9814421002", "join": "30 Jul 2026", "subs": 30, "due": "29 Aug 2026", "status": "EXPIRED", "left": -8}, {"name": "8800374472", "join": "30 Jul 2026", "subs": 30, "due": "29 Aug 2026", "status": "EXPIRED", "left": -8}, {"name": "9873841555", "join": "30 Jul 2026", "subs": 30, "due": "29 Aug 2026", "status": "EXPIRED", "left": -8}, {"name": "9466264580", "join": "30 Jul 2026", "subs": 30, "due": "29 Aug 2026", "status": "EXPIRED", "left": -8}, {"name": "9873228336", "join": "31 Jul 2026", "subs": 30, "due": "30 Aug 2026", "status": "EXPIRED", "left": -7}, {"name": "9829021922", "join": "06 Aug 2026", "subs": 30, "due": "05 Sep 2026", "status": "EXPIRED", "left": -2}, {"name": "7408080875", "join": "11 Aug 2026", "subs": 180, "due": "07 Feb 2027", "status": "ACTIVE", "left": 153}];
+const UPGRADE_URL = "https://superprofile.bio/vig/66fbdf19fbba170013b464e4";
+const DEMAT_URL = "https://forcetradingyt.github.io/rewards.html";
+const PLANS = [
+  {days:30,  name:"Monthly Subscription",      price:99,  mrp:199,  disc:"50.3%", pop:false},
+  {days:90,  name:"3 Months Subscription",       price:249, mrp:597,  disc:"58.3%", pop:false},
+  {days:180, name:"6 Months Subscription",       price:399, mrp:1194, disc:"66.6%", pop:false},
+  {days:365, name:"1 Year Subscription",         price:699, mrp:2388, disc:"70.7%", pop:true},
+  {days:730, name:"2 Year Subscription",          price:999, mrp:4776, disc:"79.1%", pop:false}
+];
+const today = new Date('2026-09-07T00:00:00');
+
+function fmt(n){return new Intl.NumberFormat('en-IN').format(n)}
+
+const WA_NUMBER="918054393976";
+const WA_MSG="Hi FTY Investment Club, I need help regarding my subscription. My registered mobile number is: ";
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+function fmtDate(d){
+  const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return String(d.getDate()).padStart(2,'0')+' '+m[d.getMonth()]+' '+d.getFullYear();
+}
+
+function check(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){toast('Please enter your mobile number');return;}
+  // normalize: digits only
+  const num=q.replace(/\D/g,'');
+  let rec=DATA.find(r=>r.name.replace(/\D/g,'')===num);
+  if(!rec){
+    notFound(q);
+    return;
+  }
+  render(rec);
+}
+
+function notFound(q){
+  const el=document.getElementById('result');
+  el.innerHTML=`<div class="card" style="text-align:center">
+    <div style="font-size:40px">🔍</div>
+    <div class="member" style="margin-top:8px">No record found</div>
+    <p class="sub" style="color:var(--muted);margin-top:6px">We couldn't find a membership for <b>${q}</b>.</p>
+    <p class="sub" style="color:var(--muted)">Please verify your number or contact us on WhatsApp for assistance.</p>
+    <button class="wa-btn" style="margin:14px auto 0;display:inline-block" onclick="contactWA('${q}')">💬 Contact on WhatsApp →</button>
+  </div>`;
+  el.classList.add('show');
+}
+
+function ringSVG(pct,color){
+  const c=2*Math.PI*34;
+  const off=c*(1-pct/100);
+  return `<svg class="ring" viewBox="0 0 80 80">
+    <circle cx="40" cy="40" r="34" fill="none" stroke="#1c2a4d" stroke-width="8"/>
+    <circle cx="40" cy="40" r="34" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/>
+    <text x="40" y="46" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">${Math.round(pct)}%</text>
+  </svg>`;
+}
+
+function render(r){
+  const el=document.getElementById('result');
+  const left=r.left;
+  let status, badge, color, pct, heading, showUpgrade=false;
+  if(r.status==='EXPIRED' || left<0){
+    status='due';badge='due';color='var(--red)';pct=0;
+    heading='Subscription Expired';showUpgrade=true;
+  } else if(left<=7){
+    status='soon';badge='soon';color='var(--amber)';
+    pct=Math.max(0,Math.min(100,(left/r.subs)*100));
+    heading='Due Soon — Renew Now';showUpgrade=true;
+  } else {
+    status='active';badge='active';color='var(--green)';
+    pct=Math.max(0,Math.min(100,(left/r.subs)*100));
+    heading='Subscription Active';
+  }
+  const remaining = left<0 ? 0 : left;
+
+  const planCard = (p,cta) => `<div class="plan ${p.pop?'pop':''}" onclick="goUpgrade()">
+      ${p.pop?'<span class="pop-tag">BEST VALUE</span>':''}
+      <div class="pl-name">${p.name}</div>
+      <span class="pl-disc">${p.disc} OFF</span>
+      <div class="pl-old">₹${fmt(p.mrp)}</div>
+      <div class="pl-price">₹${fmt(p.price)}</div>
+      <div class="pl-days">${p.days===730?'2 years':p.days===365?'1 year':p.days+' days'} · ≈ ₹${fmt(Math.round(p.price/p.days*100)/100)}/day</div>
+      <div class="pl-cta">${cta}</div>
+    </div>`;
+
+  const dueBanner = (status==='due') ? `
+    <div class="danger-banner">
+      <div class="db-icon">⚠️</div>
+      <div class="db-body">
+        <div class="db-title">⚠️ URGENT: Your Membership Benefits Are At Risk!</div>
+        <div class="db-text">Your subscription has <b>EXPIRED</b> ${Math.abs(left)} days ago. You have <b>already lost access</b> to:<br>
+          ✖ Daily market analysis & stock calls<br>
+          ✖ Premium investment research<br>
+          ✖ Community access & group benefits</div>
+        <div class="db-warn">🔔 Renew NOW before your account is permanently deactivated and you lose your member rank, referral history & all accumulated benefits.</div>
+      </div>
+    </div>` : (status==='soon' ? `
+    <div class="danger-banner amber">
+      <div class="db-icon">⏰</div>
+      <div class="db-body">
+        <div class="db-title">⏰ Only ${left} days left! Renew before it's too late.</div>
+        <div class="db-text">If you don't renew before <b>${r.due}</b>, you will <b>LOSE ALL ACCESS</b> to:<br>
+          ✖ Daily market analysis & stock calls<br>
+          ✖ Premium investment research & reports<br>
+          ✖ Community group access & discussions</div>
+        <div class="db-warn">⚡ Act fast! Expired members lose their priority rank and may need to rejoin from scratch. Don't lose what you've built — renew today!</div>
+      </div>
+    </div>` : '');
+
+  const upgrade = showUpgrade ? `
+  <div class="upgrade">
+    ${dueBanner}
+    <h3>⚡ ${status==='due'?'Reactivate Your Membership Now':'Renew Before You Lose Access'}</h3>
+    <p class="sub">${status==='due'?'Choose a plan below to instantly reactivate & restore all your membership benefits.':'Renew early to keep your benefits uninterrupted and avoid losing your membership rank.'}</p>
+    <div class="plans">
+      ${PLANS.map(p=>planCard(p, status==='due'?'Subscribe Now':'Renew Now')).join('')}
+    </div>
+    <div class="demat-box">
+      <div class="demat-head">
+        <span class="demat-emoji">🎁</span>
+        <div>
+          <div class="demat-title">Can't pay right now? Get LIFETIME ACCESS for FREE!</div>
+          <div class="demat-sub">Open a FREE Demat account through our link and unlock all premium benefits — <b>lifetime</b>, no subscription needed!</div>
+        </div>
+      </div>
+      <div class="demat-benefits">
+        <div class="db-item">✅ All Premium Trading Strategies <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ All Premium Group Access <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Premium Scanner <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Premium Ebooks <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Trading PDFs <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Video Tutorials <span class="lt">(lifetime)</span></div>
+      </div>
+      <button class="demat-btn" onclick="goDemat()">Open Free Demat Account & Get Lifetime Access →</button>
+    </div>
+  </div>` : `
+  <div class="upgrade">
+    <h3>✅ All Good!</h3>
+    <p class="sub">Your subscription is active. Want to extend or upgrade to a longer plan for extra savings?</p>
+    <div class="plans">
+      ${PLANS.filter(p=>p.days>r.subs).map(p=>planCard(p,'Upgrade Plan')).join('')}
+    </div>
+    <div class="demat-box">
+      <div class="demat-head">
+        <span class="demat-emoji">🎁</span>
+        <div>
+          <div class="demat-title">Want LIFETIME ACCESS for FREE?</div>
+          <div class="demat-sub">Open a FREE Demat account through our link and unlock all premium benefits — <b>lifetime</b>, no subscription needed!</div>
+        </div>
+      </div>
+      <div class="demat-benefits">
+        <div class="db-item">✅ All Premium Trading Strategies <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ All Premium Group Access <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Premium Scanner <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Premium Ebooks <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Trading PDFs <span class="lt">(lifetime)</span></div>
+        <div class="db-item">✅ Video Tutorials <span class="lt">(lifetime)</span></div>
+      </div>
+      <button class="demat-btn" onclick="goDemat()">Open Free Demat Account & Get Lifetime Access →</button>
+    </div>
+  </div>`;
+
+  el.innerHTML=`
+  <div class="card">
+    <div class="status-row">
+      <span class="badge ${badge}">${status==='due'?'EXPIRED':status==='soon'?'DUE SOON':'ACTIVE'}</span>
+      <span style="color:var(--muted);font-size:13px">Member ID: ${r.name}</span>
+    </div>
+    <div class="member">${heading}</div>
+
+    <div class="ring-wrap">
+      ${ringSVG(pct,color)}
+      <div>
+        <div style="font-size:30px;font-weight:800;color:${color}">${remaining}</div>
+        <div style="color:var(--muted);font-size:13px">days ${left<0?'overdue':'remaining'}</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="stat"><div class="k">Join Date</div><div class="v">${r.join}</div></div>
+      <div class="stat"><div class="k">Due Date</div><div class="v">${r.due}</div></div>
+      <div class="stat"><div class="k">Plan</div><div class="v">${r.subs} days</div></div>
+      <div class="stat"><div class="k">Status</div><div class="v" style="color:${color}">${status==='due'?'Expired':status==='soon'?'Due Soon':'Active'}</div></div>
+    </div>
+
+    ${upgrade}
+  </div>`;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function contactWA(num){
+  const n=num||document.getElementById('searchInput').value.trim()||'';
+  const msg=WA_MSG+n;
+  window.location.href="https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg);
+}
+function goUpgrade(){window.location.href=UPGRADE_URL;}
+function goDemat(){window.location.href=DEMAT_URL;}
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')check();});
+</script>
+</body>
+</html>
