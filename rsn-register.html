@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REGISTER ENTRY - DATE AND TIME</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+    body { background: #f4f8fe; padding: 1.5rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .dashboard-container { max-width: 1600px; width: 100%; background: white; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,20,40,0.06); padding: 2rem 2rem 2.5rem; }
+
+    .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; }
+    h1 { font-size: 1.9rem; font-weight: 600; color: #0b2b4a; display: flex; align-items: center; gap: 12px; letter-spacing: -0.3px; }
+    .subhead { color: #4a6479; font-size: 0.95rem; border-left: 3px solid #2a7de1; padding-left: 16px; font-weight: 400; background: #f0f5fe; border-radius: 40px; padding: 0.5rem 1.2rem; display: inline-block; margin-top: 0.2rem; }
+    .boundary-strip { display:flex; gap:12px; flex-wrap:wrap; margin:0.4rem 0 1rem; padding:0.75rem 0.9rem; background:#f8fbff; border:1px solid #dbe7f3; border-radius:16px; }
+    .boundary-card { flex:1 1 280px; min-width:240px; display:flex; align-items:center; gap:12px; padding:0.75rem 1rem; border-radius:12px; background:white; border:1px solid #e2eaf2; }
+    .boundary-card .label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#6e8aa5; }
+    .boundary-card .value { font-family:monospace; font-size:1rem; font-weight:800; color:#0b2b4a; margin-top:2px; }
+
+    /* Dual upload */
+    .upload-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin: 1rem 0 1.8rem 0; }
+    .upload-box { flex: 1; min-width: 320px; background: #f9fbfd; border: 2px dashed #cddae9; border-radius: 20px; padding: 1.2rem 1.5rem; transition: border-color 0.2s; }
+    .upload-box:hover { border-color: #7fa3c9; }
+    .upload-box.loaded { border-color: #1f7b4d; background: #f0faf3; }
+    .upload-box.error { border-color: #b15341; background: #fdf3f1; }
+    .upload-box-title { font-size: 0.8rem; font-weight: 700; color: #4a6479; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
+    .upload-box-title i { color: #2a7de1; }
+    .upload-box-inner { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+    .upload-btn { background: #1d6bc3; color: white; padding: 0.55rem 1.4rem; border-radius: 60px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.15s; border: none; }
+    .upload-btn:hover { background: #1557a0; }
+    .upload-box input[type="file"] { display: none; }
+    .upload-file-name { font-size: 0.82rem; color: #2b4d6a; background: white; padding: 0.25rem 1rem; border-radius: 60px; border: 1px solid #dce4ed; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .upload-status-text { font-size: 0.78rem; font-weight: 500; }
+    .upload-status-text.ok { color: #1f7b4d; }
+    .upload-status-text.err { color: #b15341; }
+    .upload-status-text.wait { color: #6e8aa5; }
+
+    .btn-generate { width: 100%; margin-top: 1rem; background: #1f7b4d; color: white; border: none; padding: 0.7rem 1.6rem; border-radius: 60px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s; }
+    .btn-generate:hover { background: #16633d; }
+    .btn-generate:disabled { background: #b0c4d6; cursor: not-allowed; }
+    .btn-print { background: #1f3a52; color: white; border: none; padding: 0.6rem 1.6rem; border-radius: 60px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: background 0.15s; }
+    .btn-print:hover { background: #112b40; }
+
+    .stats-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; }
+    .stat-card { background: #f9fbfd; border: 1px solid #e9eef3; border-radius: 18px; padding: 0.7rem 1.4rem 0.7rem 1.2rem; display: flex; align-items: center; gap: 12px; flex: 1 1 auto; min-width: 130px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    .stat-card i { font-size: 1.5rem; width: 32px; }
+    .stat-card .stat-label { font-size: 0.7rem; font-weight: 600; color: #6e8aa5; text-transform: uppercase; letter-spacing: 0.4px; }
+    .stat-card .stat-value { font-size: 1.25rem; font-weight: 700; color: #0b2b4a; }
+
+    .table-wrapper { overflow-x: auto; border-radius: 20px; border: 1px solid #e9eef3; background: white; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 1400px; }
+    .data-table th { background: #f2f6fc; color: #1e3b57; font-weight: 600; padding: 0.8rem 0.8rem; text-align: left; border-bottom: 2px solid #dce4ed; white-space: nowrap; position: sticky; top: 0; }
+    .data-table td { padding: 0.7rem 0.8rem; border-bottom: 1px solid #eaeef4; color: #1f3a4f; vertical-align: middle; }
+    .data-table tbody tr:hover { background-color: #f6faff; }
+    .data-table .rsn-code { font-family: monospace; background: #eef4fc; padding: 3px 12px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; display: inline-block; color: #1d6bc3; }
+    .data-table .vehicle-code { font-family: monospace; background: #f0f5fa; padding: 4px 14px; border-radius: 6px; font-weight: 700; font-size: 0.9rem; display: inline-block; border: 2px solid #0b2b4a; color: #0b2b4a; min-width: 40px; text-align: center; }
+    .veh-wrap { display: inline-flex; align-items: center; }
+    .data-table .party-name { font-weight: 500; color: #0c2b44; }
+    .data-table .qty-rate { font-weight: 500; color: #0f2c44; }
+    .data-table .destination-tag { background: #edf2f9; padding: 3px 14px; border-radius: 40px; font-size: 0.85rem; color: #2b4d6a; display: inline-block; }
+    .empty-state { padding: 2.5rem 1rem; text-align: center; color: #7b95af; font-style: italic; }
+    .empty-state i { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cbdae9; }
+
+    .footer-note { margin-top: 1.8rem; display: flex; justify-content: flex-end; font-size: 0.8rem; color: #6f8aa3; border-top: 1px solid #dfe8f2; padding-top: 1.2rem; gap: 20px; flex-wrap: wrap; }
+    .footer-note i { margin-right: 6px; color: #3a7bc8; }
+
+    @media print {
+      @page { size: A4 landscape; margin: 0.4in; }
+      body { background: white !important; padding: 0 !important; margin: 0 !important; }
+      body * { visibility: hidden !important; }
+      .dashboard-container, .dashboard-container *,
+      .stats-row, .stats-row *,
+      .table-wrapper, .table-wrapper *,
+      .data-table, .data-table *,
+      .footer-note, .footer-note *,
+      #summarySection, #summarySection * { visibility: visible !important; }
+      .dashboard-container { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; box-shadow: none !important; border: none !important; border-radius: 0 !important; padding: 0.2in !important; max-width: none !important; }
+      .upload-row, .btn-print, .btn-generate, .no-print { display: none !important; }
+      .header-row { margin-bottom: 0.4rem !important; }
+      h1 { font-size: 1.2rem !important; }
+      .subhead { font-size: 0.75rem !important; padding: 0.2rem 0.8rem !important; }
+      .stats-row { gap: 0.5rem !important; margin-bottom: 0.5rem !important; display: none !important; }
+      .stat-card { padding: 0.3rem 0.8rem !important; min-width: 90px !important; }
+      .stat-card i { font-size: 1rem !important; width: 20px !important; }
+      .stat-card .stat-label { font-size: 0.68rem !important; }
+      .stat-card .stat-value { font-size: 1.1rem !important; }
+      .table-wrapper { border-radius: 0 !important; }
+      .data-table { font-size: 0.85rem !important; min-width: 0 !important; width: 100% !important; }
+      .data-table th { padding: 0.4rem 0.5rem !important; background: #e9eef3 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .data-table td { padding: 0.35rem 0.5rem !important; }
+      .data-table .rsn-code, .data-table .vehicle-code { font-size: 0.82rem !important; padding: 2px 8px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .data-table .vehicle-code { border: 2px solid #0b2b4a !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .data-table .destination-tag { font-size: 0.78rem !important; padding: 2px 8px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .footer-note { font-size: 0.65rem !important; margin-top: 0.5rem !important; padding-top: 0.5rem !important; border-top: 1px solid #ccc !important; }
+    }
+    @media (max-width: 768px) {
+      body { padding: 0.8rem 0.4rem; }
+      .dashboard-container { padding: 1rem; }
+      .upload-row { flex-direction: column; }
+      .header-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container" id="app">
+    <!-- PATH COPY BUTTON (TOP) -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:0.8rem;">
+      <button id="pathCopyBtn" style="background:#1d6bc3; color:white; border:none; padding:0.5rem 1.2rem; border-radius:60px; font-weight:600; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:background 0.15s;" onclick="copyFolderPath()">
+        <i class="fas fa-folder-open"></i>
+        <span id="pathCopyText">Copy Path</span>
+      </button>
+    </div>
+    <script>
+      (function() {
+        var bs = String.fromCharCode(92);
+        var folderPath = "D:" + bs + "VISHAL" + bs + "PLANNIG";
+        document.getElementById('pathCopyText').textContent = "Copy Path: " + folderPath;
+      })();
+
+      function copyFolderPath() {
+        var bs = String.fromCharCode(92);
+        var path = "D:" + bs + "VISHAL" + bs + "PLANNIG";
+        var btn = document.getElementById('pathCopyBtn');
+        var txt = document.getElementById('pathCopyText');
+        var orig = txt.textContent;
+        var done = function() {
+          btn.style.background = '#1f7b4d';
+          txt.textContent = '\u2713 Copied!';
+          setTimeout(function() {
+            btn.style.background = '#1d6bc3';
+            txt.textContent = orig;
+          }, 1800);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(path).then(done).catch(function() {
+            fallbackPathCopy(path, done);
+          });
+        } else {
+          fallbackPathCopy(path, done);
+        }
+      }
+      function fallbackPathCopy(text, done) {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+    </script>
+    <div class="header-row">
+      <div>
+        <h1>REGISTER ENTRY - <span id="dateTimeLabel">DATE AND TIME</span></h1>
+        <div class="subhead"><i class="fas fa-calendar-alt" style="margin-right:8px;"></i> <span id="dataSourceLabel">Upload today's DayBook + Current SULPHURIC</span></div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <span style="background:#edf3fa;border-radius:40px;padding:0.3rem 1rem;font-size:0.8rem;">
+          <i class="fas fa-list"></i> Entries: <span id="totalRows">0</span>
+        </span>
+        <span id="lastPurchaseBadge" style="background:#f0faf3;border:1px solid #cfe7d9;border-radius:40px;padding:0.3rem 1rem;font-size:0.78rem;color:#1f7b4d;">
+          <i class="fas fa-truck-loading"></i> Last Purchase: <b>—</b>
+        </span>
+        <span id="lastSaleBadge" style="background:#eef4fc;border:1px solid #d5e2f3;border-radius:40px;padding:0.3rem 1rem;font-size:0.78rem;color:#1d6bc3;">
+          <i class="fas fa-truck"></i> Last Sale: <b>—</b>
+        </span>
+        <button class="btn-print no-print" onclick="printReport()"><i class="fas fa-print"></i> Print</button>
+      </div>
+    </div>
+
+    <div class="boundary-strip no-print" aria-label="Saved DayBook boundaries">
+      <div class="boundary-card">
+        <i class="fas fa-truck-loading" style="font-size:1.35rem;color:#1f7b4d;"></i>
+        <div><div class="label">Last Purchase Vehicle Saved</div><div class="value" id="lastPurchaseTop">—</div></div>
+      </div>
+      <div class="boundary-card">
+        <i class="fas fa-truck" style="font-size:1.35rem;color:#1d6bc3;"></i>
+        <div><div class="label">Last Sale Vehicle Saved</div><div class="value" id="lastSaleTop">—</div></div>
+      </div>
+    </div>
+
+    <!-- TODAY FILES ONLY — SELECT BOTH FILES AT ONCE -->
+    <div class="upload-row no-print">
+      <div class="upload-box" id="boxTodayPair" style="flex:1; min-width:320px;">
+        <div class="upload-box-title"><i class="fas fa-layer-group"></i> TODAY'S 2 FILES — DAYBOOK + SULPHURIC</div>
+        <div class="upload-box-inner">
+          <label class="upload-btn" for="fileTodayPair"><i class="fas fa-file-excel"></i> Choose 2 Files Together</label>
+          <input type="file" id="fileTodayPair" accept=".xlsx,.xls" multiple />
+          <span class="upload-file-name" id="fileNameTodayPair">Select today's DayBook + today's SULPHURIC</span>
+        </div>
+        <div class="upload-status-text wait" id="statusDayBook" style="margin-top:0.5rem;"><i class="fas fa-info-circle"></i> Select exactly 2 Excel files together. System will automatically detect DayBook and SULPHURIC.</div>
+        <div id="todayPairList" style="margin-top:0.6rem;display:flex;flex-direction:column;gap:0.35rem;"></div>
+        <div id="statusSulphuricCurrent" class="upload-status-text wait" style="margin-top:0.45rem;"><i class="fas fa-info-circle"></i> Current SULPHURIC vehicles will be used to filter today's new DayBook data.</div>
+      </div>
+    </div>
+
+    <div id="savedDataStatus" class="no-print" style="margin:-0.8rem 0 0.8rem; font-size:0.78rem; color:#6e8aa5;">
+      <i class="fas fa-database"></i> Checking saved DayBook boundary...
+    </div>
+    <div class="no-print" style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:0.8rem;">
+      <button type="button" id="clearSavedBtn" onclick="clearSavedDashboardData()" style="background:#fff;color:#b15341;border:1px solid #e5c5bd;padding:0.35rem 0.9rem;border-radius:60px;font-size:0.75rem;font-weight:600;cursor:pointer;">
+        <i class="fas fa-trash-alt"></i> Clear Saved Last Vehicles
+      </button>
+    </div>
+
+    <button class="btn-generate no-print" id="btnGenerate" disabled onclick="generateReport()">
+      <i class="fas fa-magic"></i> Generate Report
+    </button>
+
+    <!-- MANUAL VEHICLE CHECK -->
+    <div class="manual-check-row no-print" id="manualCheckRow" style="display:none; margin:1rem 0; background:#f9fbfd; border:2px dashed #cddae9; border-radius:20px; padding:1rem 1.5rem;">
+      <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
+        <div style="font-size:0.8rem; font-weight:700; color:#4a6479; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-search-plus" style="color:#2a7de1;"></i> Manual Vehicle Check
+        </div>
+        <textarea id="manualVehInput" placeholder="Enter last 4 digits — space, comma or new-line separated (e.g. 8266 4266 9166 0759 9622)" rows="2" style="flex:1 1 320px; min-width:280px; max-width:500px; padding:0.5rem 1rem; border:2px solid #cddae9; border-radius:16px; font-size:0.9rem; font-family:monospace; font-weight:700; color:#0b2b4a; outline:none; resize:vertical; line-height:1.5;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();checkAndAddManual()}"></textarea>
+        <button id="manualCheckBtn" style="background:#1d6bc3; color:white; border:none; padding:0.5rem 1.4rem; border-radius:60px; font-weight:600; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:background 0.15s;" onclick="checkAndAddManual()">
+          <i class="fas fa-plus-circle"></i> Check &amp; Add
+        </button>
+        <span id="manualCheckStatus" style="font-size:0.8rem; font-weight:500; color:#6e8aa5;"></span>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="statsRow" style="display:none;">
+      <div class="stat-card"><i class="fas fa-list" style="color:#2a7de1;"></i><div><div class="stat-label">Total Entries</div><div class="stat-value" id="statTotal">0</div></div></div>
+      <div class="stat-card"><i class="fas fa-link" style="color:#1f7b4d;"></i><div><div class="stat-label">Matched</div><div class="stat-value" id="statMatched">0</div></div></div>
+      <div class="stat-card"><i class="fas fa-weight-scale" style="color:#d97706;"></i><div><div class="stat-label">Total Purchase Qty</div><div class="stat-value" id="statPurQty">0</div></div></div>
+      <div class="stat-card"><i class="fas fa-tag" style="color:#0f7b4a;"></i><div><div class="stat-label">Total Sale Qty</div><div class="stat-value" id="statSaleQty">0</div></div></div>
+      <div class="stat-card stat-copy-btn no-print" id="copyAllCard" style="display:none;cursor:pointer;background:#1d6bc3;border-color:#1d6bc3;" onclick="copyAllUnderlined()">
+        <i class="fas fa-copy" style="color:white;"></i>
+        <div>
+          <div class="stat-label" style="color:#d0e3f7;">Purchase Copy</div>
+          <div class="stat-value" style="color:white;" id="copyAllCount">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-copy-btn no-print" id="copyCompletedCard" style="display:none;cursor:pointer;background:#1f7b4d;border-color:#1f7b4d;" onclick="copyAllCompleted()">
+        <i class="fas fa-check-double" style="color:white;"></i>
+        <div>
+          <div class="stat-label" style="color:#d0f0e0;">Sale Copy</div>
+          <div class="stat-value" style="color:white;" id="copyCompletedCount">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-copy-btn no-print" id="copyManualCard" style="display:none;cursor:pointer;background:#7a3fb0;border-color:#7a3fb0;" onclick="copyAllManual()">
+        <i class="fas fa-clipboard-list" style="color:white;"></i>
+        <div>
+          <div class="stat-label" style="color:#e8d5f5;">Manual Copy</div>
+          <div class="stat-value" style="color:white;" id="copyManualCount">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+      <table class="data-table" id="mainTable">
+        <thead id="tableHead">
+          <tr>
+            <th>RSN</th>
+            <th>VEHICLE</th>
+            <th>PURCHASE DATE</th>
+            <th>PURCHASE PARTY</th>
+            <th>PURCHASE RATE</th>
+            <th>PURCHASE QTY</th>
+            <th>SALE PARTY</th>
+            <th>SALE RATE</th>
+            <th>DESTINATION</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9" class="empty-state">
+            <i class="fas fa-upload"></i>
+            Upload both files and click "Generate Report"<br />
+            <span style="font-size:0.8rem;color:#9ab0c7;">Today DayBook = new Purchase/Sale data &nbsp;|&nbsp; Current SULPHURIC = today's vehicle list</span>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer-note">
+      <span><i class="fas fa-database"></i> Current SULPHURIC = vehicle filter &middot; DayBook = today's data</span>
+      <span><i class="fas fa-truck"></i> Matched by vehicle number (suffix match)</span>
+    </div>
+
+    <!-- BOTTOM SUMMARY TABLE -->
+    <div id="summarySection" style="display:none; margin-top:2.5rem; margin-bottom:1rem;">
+      <h2 style="font-size:1.3rem; font-weight:600; color:#0b2b4a; margin-bottom:1rem; display:flex; align-items:center; gap:10px;">
+        <i class="fas fa-truck-loading" style="color:#1d6bc3;"></i> Party-wise Loading & Unloading Summary
+      </h2>
+      <div class="table-wrapper">
+        <table class="data-table" id="summaryTable" style="min-width:0;">
+          <thead>
+            <tr>
+              <th>PARTY NAME</th>
+              <th>LOADING VEHICLE</th>
+              <th>QTY</th>
+              <th>UNLOADING VEHICLE</th>
+              <th>QTY</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody">
+            <tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i> No summary data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== STATE =====
+    let rsnData = [];      // [{ rsn, vehicle }] from SULPHURIC Sheet1
+    let registerData = [];  // merged purchase+sale from DayBook
+    let file1Name = '', file2Name = '';
+    let lastReportData = [];   // last generated report data (for manual check)
+    let manualAdded = [];      // manually added vehicles [{ vehicle, date }]
+
+    // ===== OFFLINE PERSISTENCE =====
+    // ONLY the last Purchase vehicle and last Sale vehicle are stored locally.
+    // No RSN, SULPHURIC, DayBook rows, report, or manual data is persisted.
+    const OFFLINE_DB_NAME = 'RSNVehicleDashboardDB';
+    const OFFLINE_DB_VERSION = 3;
+    const OFFLINE_STORE = 'dashboardState';
+
+    function openOfflineDB() {
+      return new Promise(function(resolve, reject) {
+        if (!window.indexedDB) { reject(new Error('IndexedDB is not supported by this browser.')); return; }
+        const req = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
+        req.onupgradeneeded = function(e) {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(OFFLINE_STORE)) db.createObjectStore(OFFLINE_STORE);
+          else { try { e.target.transaction.objectStore(OFFLINE_STORE).clear(); } catch (_) {} }
+        };
+        req.onsuccess = function() { resolve(req.result); };
+        req.onerror = function() { reject(req.error); };
+      });
+    }
+
+    async function saveLastDayBookBoundaries(purchaseVehicle, saleVehicle, sourceName) {
+      try {
+        const db = await openOfflineDB();
+        const state = {
+          version: 3,
+          savedAt: new Date().toISOString(),
+          lastPurchaseVehicle: str(purchaseVehicle),
+          lastSaleVehicle: str(saleVehicle),
+          sourceName: sourceName || ''
+        };
+        await new Promise(function(resolve, reject) {
+          const tx = db.transaction(OFFLINE_STORE, 'readwrite');
+          tx.objectStore(OFFLINE_STORE).put(state, 'latest');
+          tx.oncomplete = resolve;
+          tx.onerror = function() { reject(tx.error); };
+        });
+        db.close();
+        updateSavedBoundaryUI(state);
+      } catch(e) {
+        console.warn('Could not save DayBook boundaries:', e);
+        showSavedDataStatus('Could not save DayBook boundaries.', false);
+      }
+    }
+
+    async function getSavedDayBookBoundaries() {
+      try {
+        const db = await openOfflineDB();
+        const state = await new Promise(function(resolve, reject) {
+          const tx = db.transaction(OFFLINE_STORE, 'readonly');
+          const req = tx.objectStore(OFFLINE_STORE).get('latest');
+          req.onsuccess = function() { resolve(req.result || null); };
+          req.onerror = function() { reject(req.error); };
+        });
+        db.close();
+        return state && (state.lastPurchaseVehicle || state.lastSaleVehicle) ? state : null;
+      } catch(e) {
+        console.warn('Could not read saved DayBook boundaries:', e);
+        return null;
+      }
+    }
+
+    function updateSavedBoundaryUI(state) {
+      const pur = state && state.lastPurchaseVehicle ? state.lastPurchaseVehicle : '—';
+      const sale = state && state.lastSaleVehicle ? state.lastSaleVehicle : '—';
+      const pb = document.getElementById('lastPurchaseBadge');
+      const sb = document.getElementById('lastSaleBadge');
+      if (pb) pb.querySelector('b').textContent = pur;
+      if (sb) sb.querySelector('b').textContent = sale;
+      const pt = document.getElementById('lastPurchaseTop');
+      const st = document.getElementById('lastSaleTop');
+      if (pt) pt.textContent = pur;
+      if (st) st.textContent = sale;
+      if (state) {
+        showSavedDataStatus('Saved boundaries — Purchase: ' + pur + ' | Sale: ' + sale, true);
+      } else {
+        showSavedDataStatus('No saved DayBook boundary yet. First upload will establish Purchase + Sale last vehicles.', false);
+      }
+    }
+
+    async function loadOfflineDashboardData() {
+      const state = await getSavedDayBookBoundaries();
+      updateSavedBoundaryUI(state);
+    }
+
+    function showSavedDataStatus(message, ok) {
+      const el = document.getElementById('savedDataStatus');
+      if (!el) return;
+      el.style.color = ok ? '#1f7b4d' : '#6e8aa5';
+      el.innerHTML = '<i class="fas ' + (ok ? 'fa-check-circle' : 'fa-database') + '"></i> ' + message;
+    }
+
+    async function clearSavedDashboardData() {
+      if (!confirm('Clear the saved last Purchase and Sale DayBook vehicles from this computer?')) return;
+      try {
+        const db = await openOfflineDB();
+        await new Promise(function(resolve, reject) {
+          const tx = db.transaction(OFFLINE_STORE, 'readwrite');
+          tx.objectStore(OFFLINE_STORE).delete('latest');
+          tx.oncomplete = resolve;
+          tx.onerror = function() { reject(tx.error); };
+        });
+        db.close();
+        updateSavedBoundaryUI(null);
+      } catch(e) { showSavedDataStatus('Could not clear saved DayBook boundaries.', false); }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() { loadOfflineDashboardData(); });
+
+    // ===== HELPERS =====
+    function str(v) {
+      if (v === null || v === undefined) return '';
+      let s = String(v).trim();
+      if (s === 'undefined' || s === 'null' || s === 'NaN' || s === '#N/A') return '';
+      return s;
+    }
+    function num(v) {
+      if (v === null || v === undefined || v === '') return null;
+      if (typeof v === 'number') return isNaN(v) ? null : v;
+      let s = String(v).replace(/[\u20B9$,\s]/g, '').replace(/[^0-9.\-]/g, '');
+      if (s === '' || s === '-' || s === '.') return null;
+      const n = parseFloat(s);
+      return isNaN(n) ? null : n;
+    }
+    function fmt(v) {
+      if (v === null || v === undefined || v === '' || (typeof v === 'number' && isNaN(v))) return '—';
+      const n = Number(v);
+      if (isNaN(n)) return String(v);
+      return n.toLocaleString('en-IN', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+    }
+    function fmtPrice(v) {
+      const n = num(v);
+      if (n === null) return str(v) ? str(v) : '—';
+      return '\u20B9 ' + n.toLocaleString('en-IN');
+    }
+    function norm(h) { return String(h || '').trim().toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' '); }
+
+    // Normalize vehicle for suffix matching: uppercase, remove spaces
+    function normVeh(v) { return str(v).toUpperCase().replace(/\s+/g, '').trim(); }
+
+    // Extract vehicle number from text (e.g., Narration column)
+    // Patterns: "VEH NO.PB13BH4866", "VEH NO. PB13BH4866", "PB19X0542" at end
+    function extractVehicleFromText(text) {
+      if (!text) return '';
+      text = str(text);
+      if (!text) return '';
+      // Try "VEH NO." prefix
+      var m = text.match(/VEH\s*NO\.?\s*([A-Z]{2,5}\s*\d{3,5})/i);
+      if (m) return m[1].replace(/\s+/g, '').toUpperCase();
+      // Try standalone vehicle pattern: 2 letters + 2 digits + 1-3 letters + 3-5 digits
+      m = text.match(/([A-Z]{2}\d{2}[A-Z]{1,3}\d{3,5})/);
+      if (m) return m[1].toUpperCase();
+      // Try simpler pattern: 2-5 letters + 3-5 digits at end
+      m = text.match(/([A-Z]{2,5}\s*\d{3,5})\s*$/);
+      if (m) return m[1].replace(/\s+/g, '').toUpperCase();
+      // Try anywhere in text
+      m = text.match(/([A-Z]{2,5}\s*\d{3,5})/);
+      if (m) {
+        var v = m[1].replace(/\s+/g, '').toUpperCase();
+        if (v.length >= 5) return v;
+      }
+      return '';
+    }
+
+    // Format date: 2026-07-31 → 31-07-2026, or "2026-07-31 00:00:00" → "31-07-2026"
+    function formatDate(d) {
+      if (d === null || d === undefined || d === '') return '';
+      // JS Date object — use local getters (correct for the user's timezone)
+      if (d instanceof Date) {
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return dd + '-' + mm + '-' + yyyy;
+      }
+      d = str(d);
+      if (!d) return '';
+      // ISO format: 2026-07-31 or 2026-07-31 00:00:00
+      const m = d.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return m[3] + '-' + m[2] + '-' + m[1];
+      // Excel serial number (e.g., 45834)
+      const ser = Number(d);
+      if (!isNaN(ser) && ser > 30000 && ser < 60000) {
+        const date = new Date((ser - 25569) * 86400 * 1000);
+        const dd = String(date.getUTCDate()).padStart(2, '0');
+        const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const yyyy = date.getUTCFullYear();
+        return dd + '-' + mm + '-' + yyyy;
+      }
+      // Already formatted like 05-Aug-26 or 31/07/2026
+      return d;
+    }
+
+    function findCol(headers, keywords, excludes) {
+      excludes = excludes || [];
+      for (let i = 0; i < headers.length; i++) {
+        const h = norm(headers[i]);
+        if (!h) continue;
+        if (excludes.some(e => h.includes(norm(e))) && !keywords.some(k => h.includes(norm(k)))) continue;
+        if (keywords.some(k => h.includes(norm(k)))) return i;
+      }
+      return -1;
+    }
+    function findVehicleCol(headers) {
+      for (let i = 0; i < headers.length; i++) {
+        const h = norm(headers[i]);
+        if (h === 'veh' || h === 'vehicle' || h === 'veh no' || h === 'vehno' || h.includes('vessel') || h.includes('flight')) return i;
+      }
+      for (let i = 0; i < headers.length; i++) {
+        const h = norm(headers[i]);
+        if ((h.includes('veh') || h.includes('truck') || h.includes('lorry') || h.includes('vessel')) && !h.includes('total')) return i;
+      }
+      // Fallback: column right after RSN
+      for (let i = 0; i < headers.length; i++) {
+        if (norm(headers[i]) === 'rsn') return i + 1;
+      }
+      return -1;
+    }
+
+    // ===== FILE 1: Parse SULPHURIC Sheet1 — extract RSN + VEH pairs =====
+    function parseSulphuric(workbook) {
+      // Find first sheet with RSN (col B) + VEH (col C) in first 12 rows
+      for (let si = 0; si < workbook.SheetNames.length; si++) {
+        const sn = workbook.SheetNames[si];
+        const raw = XLSX.utils.sheet_to_json(workbook.Sheets[sn], { header: 1, defval: '', blankrows: false });
+        if (!raw || raw.length < 2) continue;
+
+        // Check first 12 rows for header
+        let headerFound = false;
+        let colMap = null;
+        for (let r = 0; r < Math.min(raw.length, 12); r++) {
+          const row = raw[r] || [];
+          const colB = norm(str(row[1]));
+          const colC = norm(str(row[2]));
+          if (colB === 'rsn' && (colC.includes('veh') || colC.includes('vessel'))) {
+            headerFound = true;
+            // Use column B for RSN and column C for VEH directly (fixed positions)
+            colMap = { rsn: 1, veh: 2 };
+            break;
+          }
+        }
+
+        if (!headerFound) continue;
+
+        // Parse ALL data rows from this sheet (multi-block: repeated headers)
+        const entries = [];
+        for (let r = 0; r < raw.length; r++) {
+          const row = raw[r] || [];
+          const colB = norm(str(row[1]));
+          const colC = norm(str(row[2]));
+
+          // Skip header rows (repeated)
+          if (colB === 'rsn' && (colC.includes('veh') || colC.includes('vessel'))) continue;
+
+          // Skip empty
+          if (!str(row[1]) && !str(row[2])) continue;
+
+          // Skip non-data rows
+          const rowText = row.map(c => str(c)).join(' ').toLowerCase();
+          if (rowText.includes('prepared by') || rowText.includes('planning') || rowText.includes('amendment')) continue;
+
+          const rsn = str(row[colMap.rsn]);
+          const vehicle = str(row[colMap.veh]);
+
+          if (!rsn && !vehicle) continue;
+          if (rsn.toLowerCase().includes('total') || vehicle.toLowerCase().includes('total')) continue;
+          if (rsn.toLowerCase().includes('grand') || vehicle.toLowerCase().includes('grand')) continue;
+
+          if (rsn && vehicle) {
+            // Also extract FROM (purchase party) from column F (index 5) and QTY MT from column E (index 4)
+            const fromParty = str(row[5]);
+            const qtyMt = str(row[4]);
+            entries.push({ rsn: rsn, vehicle: vehicle, fromParty: fromParty, qtyMt: qtyMt });
+          }
+        }
+
+        if (entries.length > 0) return { sheetName: sn, entries: entries };
+      }
+      return null;
+    }
+
+    // ===== FILE 2: Parse DayBook register (purchase + sale) =====
+    function detectHeaderRow(rows) {
+      let best = { score: -1, index: 0 };
+      const limit = Math.min(rows.length, 20);
+      for (let i = 0; i < limit; i++) {
+        const row = rows[i] || [];
+        if (!row || row.length === 0) continue;
+        let score = 0;
+        const normed = row.map(norm);
+        if (normed.some(h => h.includes('veh') || h.includes('vessel'))) score += 3;
+        if (normed.some(h => h.includes('qty') || h.includes('quantity'))) score += 2;
+        if (normed.some(h => h.includes('rate') || h.includes('price'))) score += 2;
+        if (normed.some(h => h.includes('particular') || h.includes('party') || h.includes('name'))) score += 2;
+        if (normed.some(h => h.includes('dest'))) score += 1;
+        if (score > best.score) best = { score: score, index: i };
+      }
+      return best.index;
+    }
+
+    function parseRegisterSheet(rawRows) {
+      if (!rawRows || rawRows.length < 2) return [];
+      const headerRowIdx = detectHeaderRow(rawRows);
+      const headers = (rawRows[headerRowIdx] || []).map(h => str(h));
+
+      let vehIdx = findVehicleCol(headers);
+      const partyIdx = findCol(headers, ['particular', 'party', 'name', 'firm', 'company', 'consignee', 'buyer', 'seller', 'supplier', 'customer'], ['qty', 'rate', 'price', 'amount', 'total']);
+      const qtyIdx = findCol(headers, ['qty', 'quantity', 'qt', 'wt', 'weight', 'ton', 'mt', 'bag'], []);
+      const rateIdx = findCol(headers, ['rate', 'price', 'amt per', 'per mt', 'per ton'], []);
+      const destIdx = findCol(headers, ['dest', 'destination', 'place', 'city', 'consign'], ['total']);
+      const dateIdx = findCol(headers, ['date'], []);
+      // Narration column — fallback for vehicle number extraction
+      const narrationIdx = findCol(headers, ['narration', 'remark', 'note', 'description', 'details'], []);
+
+      // If vehicle column not found by header, try data pattern
+      if (vehIdx === -1) {
+        let bestCol = -1, bestScore = 0;
+        for (let c = 0; c < headers.length; c++) {
+          let hits = 0, total = 0;
+          for (let r = headerRowIdx + 1; r < Math.min(rawRows.length, headerRowIdx + 20); r++) {
+            const v = str(rawRows[r] && rawRows[r][c]);
+            if (!v) continue;
+            total++;
+            if (/\d/.test(v) && v.length <= 25) hits++;
+          }
+          if (total > 0 && hits / total > 0.5 && hits > bestScore) { bestScore = hits; bestCol = c; }
+        }
+        vehIdx = bestCol;
+      }
+
+      // Detect destination column by pattern if not found by header
+      let actualDestIdx = destIdx;
+      if (actualDestIdx === -1 && vehIdx !== -1) {
+        for (let c = 0; c < headers.length; c++) {
+          if (c === vehIdx || c === partyIdx || c === qtyIdx || c === rateIdx || c === dateIdx) continue;
+          let firstValRow = -1;
+          let firstRawVal = null;
+          for (let r = headerRowIdx + 1; r < rawRows.length; r++) {
+            const rv = rawRows[r] && rawRows[r][c];
+            const sv = str(rv);
+            if (sv) { firstValRow = r; firstRawVal = rv; break; }
+          }
+          if (firstValRow === -1) continue;
+          // Skip if first value is a Date object
+          if (firstRawVal instanceof Date) continue;
+          let textCount = 0, valCount = 0;
+          for (let r = firstValRow; r < rawRows.length; r++) {
+            const rv = rawRows[r] && rawRows[r][c];
+            const sv = str(rv);
+            if (!sv) continue;
+            if (rv instanceof Date) continue;
+            valCount++;
+            if (isNaN(Number(sv))) textCount++;
+          }
+          if (valCount > 0 && textCount / valCount > 0.7) { actualDestIdx = c; break; }
+        }
+      }
+
+      if (vehIdx === -1 && partyIdx === -1) return [];
+
+      const purchaseMap = {}, saleMap = {}, order = [];
+      for (let r = headerRowIdx + 1; r < rawRows.length; r++) {
+        const row = rawRows[r];
+        if (!row) continue;
+        let vehicle = vehIdx !== -1 ? str(row[vehIdx]) : '';
+        // If vehicle not found in Vessel column, try extracting from Narration
+        if (!vehicle && narrationIdx !== -1) {
+          vehicle = extractVehicleFromText(row[narrationIdx]);
+        }
+        const party = partyIdx !== -1 ? str(row[partyIdx]) : '';
+        const qty = qtyIdx !== -1 ? num(row[qtyIdx]) : null;
+        const rate = rateIdx !== -1 ? num(row[rateIdx]) : null;
+        const dest = actualDestIdx !== -1 ? str(row[actualDestIdx]) : '';
+
+        if (!vehicle && !party && qty === null && rate === null && !dest) continue;
+        if (!vehicle && !party) continue;
+        const check = (vehicle + party).toLowerCase();
+        if (check.includes('total') || check.includes('grand') || check.includes('sum of')) continue;
+
+        const key = vehicle || party;
+        const dateStr = dateIdx !== -1 ? formatDate(row[dateIdx]) : '';
+        if (dest) {
+          if (!saleMap[key]) { saleMap[key] = { party: party, qty: 0, rate: rate, dest: dest }; order.push(key); }
+          saleMap[key].qty += (qty || 0);
+          if (saleMap[key].rate === null) saleMap[key].rate = rate;
+          if (party && !saleMap[key].party) saleMap[key].party = party;
+        } else {
+          if (!purchaseMap[key]) { purchaseMap[key] = { party: party, qty: 0, rate: rate, date: dateStr }; if (!order.includes(key)) order.push(key); }
+          purchaseMap[key].qty += (qty || 0);
+          if (purchaseMap[key].rate === null) purchaseMap[key].rate = rate;
+          if (party && !purchaseMap[key].party) purchaseMap[key].party = party;
+          if (dateStr && !purchaseMap[key].date) purchaseMap[key].date = dateStr;
+        }
+      }
+
+      const merged = [];
+      order.forEach(key => {
+        const p = purchaseMap[key] || {};
+        const s = saleMap[key] || {};
+        merged.push({ vehicle: key, purchaseParty: p.party || '', purchaseQty: p.qty || null, purchaseRate: p.rate || null, purchaseDate: p.date || '', saleParty: s.party || '', saleQty: s.qty || null, saleRate: s.rate || null, destination: s.dest || '' });
+      });
+      return merged;
+    }
+
+    // Try parsing DayBook file — could be single sheet register OR separate purchase/sale sheets
+    function parseDayBook(workbook) {
+      const sheetNames = workbook.SheetNames;
+
+      // Try separate purchase/sale sheets
+      let pSheet = null, sSheet = null;
+      sheetNames.forEach(n => {
+        const l = n.toLowerCase();
+        if (!pSheet && (l.includes('purchase') || l.includes('pur'))) pSheet = n;
+        if (!sSheet && (l.includes('sale') || l.includes('sell') || l.includes('invoice') || l.includes('dispatch'))) sSheet = n;
+      });
+
+      if (pSheet && sSheet && pSheet !== sSheet) {
+        const pRaw = XLSX.utils.sheet_to_json(workbook.Sheets[pSheet], { header: 1, defval: '', blankrows: false });
+        const sRaw = XLSX.utils.sheet_to_json(workbook.Sheets[sSheet], { header: 1, defval: '', blankrows: false });
+        const pArr = parseRegisterSheet(pRaw);
+        const sArr = parseRegisterSheet(sRaw);
+        if (pArr.length > 0 && sArr.length === 0) {
+          return { merged: pArr, source: pSheet };
+        }
+        if (pArr.length === 0 && sArr.length > 0) {
+          return { merged: sArr, source: sSheet };
+        }
+        if (pArr.length > 0 || sArr.length > 0) {
+          // Merge by vehicle
+          const map = {}, order = [];
+          pArr.forEach(p => { if (!map[p.vehicle]) { map[p.vehicle] = { vehicle: p.vehicle, purchaseParty: '', purchaseQty: null, purchaseRate: null, purchaseDate: '', saleParty: '', saleQty: null, saleRate: null, destination: '' }; order.push(p.vehicle); } map[p.vehicle].purchaseParty = p.purchaseParty; map[p.vehicle].purchaseQty = p.purchaseQty; map[p.vehicle].purchaseRate = p.purchaseRate; map[p.vehicle].purchaseDate = p.purchaseDate || ''; });
+          sArr.forEach(s => { if (!map[s.vehicle]) { map[s.vehicle] = { vehicle: s.vehicle, purchaseParty: '', purchaseQty: null, purchaseRate: null, saleParty: '', saleQty: null, saleRate: null, destination: '' }; order.push(s.vehicle); } map[s.vehicle].saleParty = s.saleParty; map[s.vehicle].saleQty = s.saleQty; map[s.vehicle].saleRate = s.saleRate; map[s.vehicle].destination = s.destination; });
+          return { merged: order.map(k => map[k]), source: pSheet + ' + ' + sSheet };
+        }
+      }
+
+      // Try single sheet register (purchase above / sale below)
+      for (let si = 0; si < sheetNames.length; si++) {
+        const raw = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[si]], { header: 1, defval: '', blankrows: false });
+        const result = parseRegisterSheet(raw);
+        if (result.length > 0) return { merged: result, source: sheetNames[si] };
+      }
+
+      return null;
+    }
+
+
+    // ===== DAYBOOK DAILY DELTA MODE =====
+    // When two cumulative DayBook files are uploaded:
+    // File 1 = yesterday, File 2 = today.
+    // We find the last vehicle/data row from yesterday in today's file and
+    // keep only the rows that come AFTER that boundary.
+    function findDayBookSheets(workbook) {
+      let pSheet = null, sSheet = null;
+      workbook.SheetNames.forEach(function(n) {
+        const l = n.toLowerCase();
+        if (!pSheet && (l.includes('purchase') || l.includes('pur'))) pSheet = n;
+        if (!sSheet && (l.includes('sale') || l.includes('sell') || l.includes('invoice') || l.includes('dispatch'))) sSheet = n;
+      });
+      return { purchase: pSheet, sale: sSheet };
+    }
+
+    function getRawSheet(workbook, sheetName) {
+      if (!sheetName || !workbook.Sheets[sheetName]) return [];
+      return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+        header: 1, defval: '', blankrows: false
+      });
+    }
+
+    function getVehicleColumnAndHeader(rawRows) {
+      if (!rawRows || !rawRows.length) return { headerRow: 0, vehIdx: -1, narrationIdx: -1 };
+      const headerRow = detectHeaderRow(rawRows);
+      const headers = (rawRows[headerRow] || []).map(function(h){ return str(h); });
+      let vehIdx = findVehicleCol(headers);
+      const narrationIdx = findCol(headers, ['narration','remark','note','description','details'], []);
+      return { headerRow: headerRow, vehIdx: vehIdx, narrationIdx: narrationIdx };
+    }
+
+    function getVehicleFromRow(row, meta) {
+      if (!row || !meta) return '';
+      if (meta.vehIdx !== -1) {
+        const direct = str(row[meta.vehIdx]);
+        if (direct && !/^(vessel|vehicle|veh|veh no)$/i.test(direct)) return direct;
+      }
+      if (meta.narrationIdx !== -1) {
+        const fromNarration = extractVehicleFromText(row[meta.narrationIdx]);
+        if (fromNarration) return fromNarration;
+      }
+      return '';
+    }
+
+    function isValidDayBookDataRow(row, vehIdx, headerRow, rowIndex, narrationIdx) {
+      if (rowIndex <= headerRow) return false;
+      const vehicle = getVehicleFromRow(row, { vehIdx: vehIdx, narrationIdx: narrationIdx === undefined ? -1 : narrationIdx });
+      const text = (row || []).map(str).join(' ').toLowerCase();
+      if (!vehicle) return false;
+      if (text.includes('grand total') || text.includes('total')) return false;
+      if (vehicle.toLowerCase().includes('vessel') || vehicle.toLowerCase().includes('vehicle')) return false;
+      return true;
+    }
+
+    function rowSignature(row, vehIdx) {
+      const vehicle = vehIdx !== -1 ? str(row[vehIdx]).toUpperCase().replace(/\s+/g,'') : '';
+      const date = row && row.length ? str(row[0]) : '';
+      const party = row && row.length > 1 ? str(row[1]).toUpperCase() : '';
+      const narration = row && row.length > 4 ? str(row[4]).toUpperCase() : '';
+      return vehicle + '|' + date + '|' + party + '|' + narration;
+    }
+
+    function findLastPreviousBoundary(previousRaw, currentRaw) {
+      const prevMeta = getVehicleColumnAndHeader(previousRaw);
+      const currMeta = getVehicleColumnAndHeader(currentRaw);
+      if (prevMeta.vehIdx === -1 || currMeta.vehIdx === -1) return null;
+
+      let prevLastIndex = -1;
+      for (let r = previousRaw.length - 1; r > prevMeta.headerRow; r--) {
+        if (isValidDayBookDataRow(previousRaw[r], prevMeta.vehIdx, prevMeta.headerRow, r, prevMeta.narrationIdx)) {
+          prevLastIndex = r;
+          break;
+        }
+      }
+      if (prevLastIndex === -1) return null;
+
+      const prevRow = previousRaw[prevLastIndex];
+      const prevVehicle = getVehicleFromRow(prevRow, prevMeta).toUpperCase().replace(/\s+/g,'');
+      const prevSig = rowSignature(prevRow, prevMeta.vehIdx);
+
+      // Prefer exact last-row signature, searching from the bottom.
+      for (let r = currentRaw.length - 1; r > currMeta.headerRow; r--) {
+        if (!isValidDayBookDataRow(currentRaw[r], currMeta.vehIdx, currMeta.headerRow, r, currMeta.narrationIdx)) continue;
+        if (rowSignature(currentRaw[r], currMeta.vehIdx) === prevSig) {
+          return {
+            rowIndex: r,
+            vehicle: getVehicleFromRow(currentRaw[r], currMeta),
+            mode: 'exact'
+          };
+        }
+      }
+
+      // Fallback: user's requested rule — last vehicle number.
+      for (let r = currentRaw.length - 1; r > currMeta.headerRow; r--) {
+        if (!isValidDayBookDataRow(currentRaw[r], currMeta.vehIdx, currMeta.headerRow, r, currMeta.narrationIdx)) continue;
+        const v = getVehicleFromRow(currentRaw[r], currMeta).toUpperCase().replace(/\s+/g,'');
+        if (v === prevVehicle) {
+          return {
+            rowIndex: r,
+            vehicle: getVehicleFromRow(currentRaw[r], currMeta),
+            mode: 'vehicle'
+          };
+        }
+      }
+      return null;
+    }
+
+    function mergeRegisterArrays(pArr, sArr) {
+      const map = {}, order = [];
+      (pArr || []).forEach(function(p) {
+        if (!map[p.vehicle]) {
+          map[p.vehicle] = { vehicle: p.vehicle, purchaseParty:'', purchaseQty:null, purchaseRate:null,
+            purchaseDate:'', saleParty:'', saleQty:null, saleRate:null, destination:'' };
+          order.push(p.vehicle);
+        }
+        map[p.vehicle].purchaseParty = p.purchaseParty || '';
+        map[p.vehicle].purchaseQty = p.purchaseQty;
+        map[p.vehicle].purchaseRate = p.purchaseRate;
+        map[p.vehicle].purchaseDate = p.purchaseDate || '';
+      });
+      (sArr || []).forEach(function(s) {
+        if (!map[s.vehicle]) {
+          map[s.vehicle] = { vehicle: s.vehicle, purchaseParty:'', purchaseQty:null, purchaseRate:null,
+            purchaseDate:'', saleParty:'', saleQty:null, saleRate:null, destination:'' };
+          order.push(s.vehicle);
+        }
+        map[s.vehicle].saleParty = s.saleParty || '';
+        map[s.vehicle].saleQty = s.saleQty;
+        map[s.vehicle].saleRate = s.saleRate;
+        map[s.vehicle].destination = s.destination || '';
+      });
+      return order.map(function(k){ return map[k]; });
+    }
+
+    // ===== CURRENT SULPHURIC FILTER =====
+    // Never carry old DayBook data into today's report unless the vehicle is present
+    // in the CURRENT SULPHURIC sheet. Matching uses the same numeric-tail rule as the report.
+    function filterRegisterToCurrentSulphuric() {
+      if (!Array.isArray(rsnData) || rsnData.length === 0 || !Array.isArray(registerData)) return;
+      const allowed = new Set();
+      rsnData.forEach(function(item) {
+        const tail = extractNumberTail(item.vehicle);
+        if (tail) allowed.add(tail);
+      });
+      const before = registerData.length;
+      registerData = registerData.filter(function(item) {
+        const tail = extractNumberTail(item.vehicle);
+        return tail && allowed.has(tail);
+      });
+      return { before: before, after: registerData.length };
+    }
+
+    function findLastDayBookVehicle(workbook) {
+      let last = '';
+      workbook.SheetNames.forEach(function(sheetName) {
+        const raw = getRawSheet(workbook, sheetName);
+        const meta = getVehicleColumnAndHeader(raw);
+        if (meta.vehIdx === -1) return;
+        for (let r = raw.length - 1; r > meta.headerRow; r--) {
+          if (isValidDayBookDataRow(raw[r], meta.vehIdx, meta.headerRow, r, meta.narrationIdx)) {
+            last = str(raw[r][meta.vehIdx]);
+            break;
+          }
+        }
+      });
+      return last;
+    }
+
+    function findBoundaryRowByVehicle(rawRows, vehicle) {
+      const meta = getVehicleColumnAndHeader(rawRows);
+      if (meta.vehIdx === -1 || !vehicle) return null;
+      const targetTail = extractNumberTail(vehicle);
+      const targetNorm = normVeh(vehicle);
+      for (let r = rawRows.length - 1; r > meta.headerRow; r--) {
+        if (!isValidDayBookDataRow(rawRows[r], meta.vehIdx, meta.headerRow, r, meta.narrationIdx)) continue;
+        const current = getVehicleFromRow(rawRows[r], meta);
+        if (normVeh(current) === targetNorm || (targetTail && extractNumberTail(current) === targetTail)) {
+          return { rowIndex: r, vehicle: current };
+        }
+      }
+      return null;
+    }
+
+    // File 1 is yesterday and File 2 is today.
+    // ONLY the previous DayBook's LAST VEHICLE is used as the boundary.
+    // No previous Excel data is carried forward.
+    function parseDayBookDelta(previousWb, currentWb, savedBoundaryVehicle) {
+      const currSheets = findDayBookSheets(currentWb);
+      if (!currSheets.purchase || !currSheets.sale) return null;
+
+      // On first run use File 1 only to establish the previous last vehicle.
+      // On later runs, use the one saved vehicle and do NOT use old File 1 data.
+      const boundaryVehicle = savedBoundaryVehicle || findLastDayBookVehicle(previousWb);
+      if (!boundaryVehicle) return null;
+
+      const details = [];
+      let pArr = [], sArr = [];
+      [
+        { key:'purchase', label:'Purchase' },
+        { key:'sale', label:'Sale' }
+      ].forEach(function(info) {
+        const currRaw = getRawSheet(currentWb, currSheets[info.key]);
+        const boundary = findBoundaryRowByVehicle(currRaw, boundaryVehicle);
+        if (!boundary) {
+          details.push(info.label + ': boundary vehicle ' + boundaryVehicle + ' not found');
+          return;
+        }
+        const currMeta = getVehicleColumnAndHeader(currRaw);
+        const sliced = [currRaw[currMeta.headerRow]].concat(currRaw.slice(boundary.rowIndex + 1));
+        const parsed = parseRegisterSheet(sliced);
+        if (info.key === 'purchase') pArr = parsed; else sArr = parsed;
+        details.push(info.label + ': after ' + boundary.vehicle + ' → ' + parsed.length + ' new vehicle records');
+      });
+
+      return {
+        merged: mergeRegisterArrays(pArr, sArr),
+        source: currSheets.purchase + ' + ' + currSheets.sale,
+        details: details,
+        boundaryVehicle: boundaryVehicle
+      };
+    }
+
+    // ===== MATCH: SULPHURIC RSN ↔ DayBook by vehicle number =====
+    // Extract the numeric tail after the last letter in a vehicle number.
+    // PB19H4666 → "4666", PB13BF5366 → "5366", PB19X0554 → "554"
+    // Then match SULPHURIC number directly against this tail.
+    // This prevents "366" from matching "5366".
+    function extractNumberTail(veh) {
+      const v = normVeh(veh);
+      let lastLetterIdx = -1;
+      for (let i = v.length - 1; i >= 0; i--) {
+        if (/[A-Z]/.test(v[i])) { lastLetterIdx = i; break; }
+      }
+      let numPart = lastLetterIdx === -1 ? v : v.substring(lastLetterIdx + 1);
+      // Strip leading zeros for comparison
+      numPart = numPart.replace(/^0+/, '');
+      return numPart;
+    }
+
+    function matchReport(rsnEntries, registerEntries) {
+      // Build lookup by the SAME numeric-tail mechanism used everywhere else.
+      // Important: one physical vehicle can appear with different formats in DayBook
+      // (e.g. PB13BF0551 vs 551). Do NOT keep only the first row. Merge all
+      // purchase/sale information that belongs to the same numeric tail.
+      const registerByTail = {};
+
+      function mergeTailEntry(existing, reg) {
+        if (!existing) {
+          return {
+            vehicle: str(reg.vehicle),
+            purchaseParty: str(reg.purchaseParty),
+            purchaseQty: reg.purchaseQty,
+            purchaseRate: reg.purchaseRate,
+            purchaseDate: str(reg.purchaseDate),
+            saleParty: str(reg.saleParty),
+            saleQty: reg.saleQty,
+            saleRate: reg.saleRate,
+            destination: str(reg.destination)
+          };
+        }
+
+        // Keep the first useful vehicle representation, but fill missing fields
+        // from any later row having the same numeric tail.
+        if (!existing.vehicle && reg.vehicle) existing.vehicle = str(reg.vehicle);
+        if (!existing.purchaseParty && reg.purchaseParty) existing.purchaseParty = str(reg.purchaseParty);
+        if (!existing.purchaseDate && reg.purchaseDate) existing.purchaseDate = str(reg.purchaseDate);
+        if (existing.purchaseQty === null || existing.purchaseQty === undefined) {
+          if (reg.purchaseQty !== null && reg.purchaseQty !== undefined) existing.purchaseQty = reg.purchaseQty;
+        }
+        if (existing.purchaseRate === null || existing.purchaseRate === undefined) {
+          if (reg.purchaseRate !== null && reg.purchaseRate !== undefined) existing.purchaseRate = reg.purchaseRate;
+        }
+
+        if (!existing.saleParty && reg.saleParty) existing.saleParty = str(reg.saleParty);
+        if (!existing.destination && reg.destination) existing.destination = str(reg.destination);
+        if (existing.saleQty === null || existing.saleQty === undefined) {
+          if (reg.saleQty !== null && reg.saleQty !== undefined) existing.saleQty = reg.saleQty;
+        }
+        if (existing.saleRate === null || existing.saleRate === undefined) {
+          if (reg.saleRate !== null && reg.saleRate !== undefined) existing.saleRate = reg.saleRate;
+        }
+
+        // If separate DayBook rows represent the same tail, add quantities rather
+        // than dropping the second row.
+        if (existing.purchaseQty !== null && existing.purchaseQty !== undefined &&
+            reg.purchaseQty !== null && reg.purchaseQty !== undefined &&
+            existing.purchaseQty !== reg.purchaseQty) {
+          existing.purchaseQty = Number(existing.purchaseQty) + Number(reg.purchaseQty);
+        }
+        if (existing.saleQty !== null && existing.saleQty !== undefined &&
+            reg.saleQty !== null && reg.saleQty !== undefined &&
+            existing.saleQty !== reg.saleQty) {
+          existing.saleQty = Number(existing.saleQty) + Number(reg.saleQty);
+        }
+
+        return existing;
+      }
+
+      registerEntries.forEach(function(reg) {
+        const tail = extractNumberTail(reg.vehicle);
+        if (!tail) return;
+        registerByTail[tail] = mergeTailEntry(registerByTail[tail], reg);
+      });
+
+      const result = [];
+      let matchedCount = 0;
+
+      rsnEntries.forEach(function(rsnItem) {
+        const sTail = extractNumberTail(rsnItem.vehicle);
+        const bestMatch = sTail ? registerByTail[sTail] || null : null;
+
+        if (bestMatch) {
+          matchedCount++;
+          result.push({
+            rsn: rsnItem.rsn,
+            vehicle: rsnItem.vehicle,
+            matchedVehicle: bestMatch.vehicle,
+            purchaseParty: bestMatch.purchaseParty || rsnItem.fromParty || '',
+            fromParty: rsnItem.fromParty || '',
+            qtyMt: rsnItem.qtyMt || '',
+            purchaseDate: bestMatch.purchaseDate || '—',
+            purchaseQty: bestMatch.purchaseQty,
+            purchaseRate: bestMatch.purchaseRate,
+            saleParty: bestMatch.saleParty,
+            saleQty: bestMatch.saleQty,
+            saleRate: bestMatch.saleRate,
+            destination: bestMatch.destination,
+            matched: true
+          });
+        } else {
+          result.push({
+            rsn: rsnItem.rsn,
+            vehicle: rsnItem.vehicle,
+            matchedVehicle: '',
+            fromParty: rsnItem.fromParty || '',
+            qtyMt: rsnItem.qtyMt || '',
+            purchaseDate: '—',
+            purchaseParty: rsnItem.fromParty || '',
+            purchaseQty: null, purchaseRate: null,
+            saleParty: '', saleQty: null, saleRate: null,
+            destination: '',
+            matched: false
+          });
+        }
+      });
+
+      // Sort by RSN series (A1, A2, A3... M1, M2...)
+      result.sort(function(a, b) {
+        const ra = str(a.rsn).toUpperCase();
+        const rb = str(b.rsn).toUpperCase();
+        // Extract letter prefix and number: A16 → prefix="A", num=16
+        const am = ra.match(/^([A-Z]*)(\d+)$/);
+        const bm = rb.match(/^([A-Z]*)(\d+)$/);
+        if (am && bm) {
+          if (am[1] !== bm[1]) return am[1].localeCompare(bm[1]);
+          return parseInt(am[2]) - parseInt(bm[2]);
+        }
+        return ra.localeCompare(rb);
+      });
+      return { data: result, matched: matchedCount };
+    }
+
+    // ===== RENDER =====
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-inbox"></i> No data</td></tr>';
+        return;
+      }
+      let html = '';
+      data.forEach(item => {
+        const dest = str(item.destination) || '—';
+        const rowClass = item.matched ? '' : ' style="opacity:0.5;"';
+        const purDate = str(item.purchaseDate) || '—';
+        // Underline vehicle ONLY when matched in DayBook, has purchase data, but no sale
+        const hasPurchase = item.matched && (item.purchaseQty !== null || item.purchaseRate !== null);
+        const hasSale = str(item.saleParty) || item.saleQty || item.saleRate || str(item.destination);
+        // BOX only when sale exists. Purchase-only or no-sale = plain text (no box).
+        let vehCell;
+        if (hasSale) {
+          // Sale vehicle — show in box
+          vehCell = '<span class="veh-wrap"><span class="vehicle-code">' + str(item.vehicle) + '</span></span>';
+        } else if (hasPurchase) {
+          // Purchase only, no sale — underline, NO box
+          vehCell = '<span style="text-decoration: underline; font-family: monospace; font-weight: 700; font-size: 0.9rem; color: #0b2b4a;">' + str(item.vehicle) + '</span>';
+        } else {
+          // No sale, no purchase — plain text, no box
+          vehCell = '<span style="font-family: monospace; font-weight: 600; font-size: 0.9rem; color: #1f3a4f;">' + str(item.vehicle) + '</span>';
+        }
+        html += '<tr' + rowClass + '>' +
+          '<td><span class="rsn-code">' + str(item.rsn) + '</span></td>' +
+          '<td>' + vehCell + '</td>' +
+          '<td class="qty-rate">' + purDate + '</td>' +
+          '<td class="party-name">' + (str(item.purchaseParty) || '—') + '</td>' +
+          '<td class="qty-rate">' + fmtPrice(item.purchaseRate) + '</td>' +
+          '<td class="qty-rate">' + fmt(item.purchaseQty) + '</td>' +
+          '<td class="party-name">' + (str(item.saleParty) || '—') + '</td>' +
+          '<td class="qty-rate">' + fmtPrice(item.saleRate) + '</td>' +
+          '<td><span class="destination-tag">' + dest + '</span></td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function updateStats(data, matched) {
+      let tpq = 0, tsq = 0;
+      data.forEach(item => {
+        const pq = num(item.purchaseQty); if (pq !== null && pq > 0) tpq += pq;
+        const sq = num(item.saleQty); if (sq !== null && sq > 0) tsq += sq;
+      });
+      document.getElementById('statTotal').textContent = data.length;
+      document.getElementById('statMatched').textContent = matched;
+      document.getElementById('statPurQty').textContent = tpq.toFixed(2);
+      document.getElementById('statSaleQty').textContent = tsq.toFixed(2);
+      // Count underlined vehicles (purchase but no sale)
+      let underlinedCount = 0;
+      let completedCount = 0;
+      data.forEach(item => {
+        const hasPurchase = item.matched && (item.purchaseQty !== null || item.purchaseRate !== null);
+        const hasSale = str(item.saleParty) || item.saleQty || item.saleRate || str(item.destination);
+        if (hasPurchase && !hasSale) underlinedCount++;
+        if (hasSale) completedCount++;
+      });
+      const copyCard = document.getElementById('copyAllCard');
+      const copyCountEl = document.getElementById('copyAllCount');
+      if (copyCard) {
+        if (underlinedCount > 0) {
+          copyCountEl.textContent = underlinedCount;
+          copyCard.style.display = 'flex';
+        } else {
+          copyCard.style.display = 'none';
+        }
+      }
+      const compCard = document.getElementById('copyCompletedCard');
+      const compCountEl = document.getElementById('copyCompletedCount');
+      if (compCard) {
+        if (completedCount > 0) {
+          compCountEl.textContent = completedCount;
+          compCard.style.display = 'flex';
+        } else {
+          compCard.style.display = 'none';
+        }
+      }
+      document.getElementById('totalRows').textContent = data.length;
+      document.getElementById('statsRow').style.display = 'flex';
+      // Show manual check row when report is generated
+      document.getElementById('manualCheckRow').style.display = 'block';
+    }
+
+    function setStatus(boxId, statusId, msg, type) {
+      const box = document.getElementById(boxId);
+      const el = document.getElementById(statusId);
+      box.classList.remove('loaded', 'error');
+      el.classList.remove('ok', 'err', 'wait');
+      if (type === 'ok') { box.classList.add('loaded'); el.classList.add('ok'); el.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg; }
+      else if (type === 'err') { box.classList.add('error'); el.classList.add('err'); el.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg; }
+      else { el.classList.add('wait'); el.innerHTML = '<i class="fas fa-info-circle"></i> ' + msg; }
+      updateGenerateButton();
+    }
+
+    function updateGenerateButton() {
+      const btn = document.getElementById('btnGenerate');
+      // A report must also be allowed when today's DayBook has zero NEW rows.
+      // The report is still useful because current SULPHURIC vehicles must be shown
+      // as unmatched/pending. Only the DayBook rows are delta-filtered.
+      const ready = rsnData.length > 0;
+      btn.disabled = !ready;
+      if (ready) generateReport();
+    }
+
+    // ===== GENERATE REPORT =====
+    function generateReport() {
+      if (rsnData.length === 0) return;
+      // registerData may legitimately be empty when there are no new DayBook rows today.
+      // matchReport() will then render all current SULPHURIC vehicles as unmatched.
+
+      const report = matchReport(rsnData, registerData);
+      lastReportData = report.data;
+      manualAdded = [];
+      updateManualCard();
+      renderTable(report.data);
+      updateStats(report.data, report.matched);
+      document.getElementById('dataSourceLabel').textContent = 'Current SULPHURIC: ' + file1Name + ' · Today DayBook: ' + file2Name;
+      document.getElementById('tableHead').innerHTML = '<tr>' +
+        '<th>RSN</th><th>VEHICLE</th><th>PURCHASE DATE</th>' +
+        '<th>PURCHASE PARTY</th><th>PURCHASE RATE</th><th>PURCHASE QTY</th>' +
+        '<th>SALE PARTY</th><th>SALE RATE</th>' +
+        '<th>DESTINATION</th></tr>';
+      document.getElementById('mainTable').style.minWidth = '1500px';
+      renderSummaryTable(report.data);
+      
+    }
+
+    // ===== RENDER SUMMARY TABLE (Party-wise Loading & Unloading) =====
+    function renderSummaryTable(data) {
+      const section = document.getElementById('summarySection');
+      const tbody = document.getElementById('summaryBody');
+      if (!data || data.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      // Build a QTY lookup from rsnData: vehicle tail → qtyMt
+      const qtyLookup = {};
+      rsnData.forEach(function (item) {
+        const tail = extractNumberTail(item.vehicle);
+        if (tail && item.qtyMt) qtyLookup[tail] = item.qtyMt;
+      });
+
+      // Build party map: partyName → { loading: [], unloading: [] }
+      const partyMap = {};
+      const partyOrder = [];
+
+      data.forEach(function (item) {
+        const hasPurchase = item.matched && (item.purchaseQty !== null || item.purchaseRate !== null);
+        const hasSale = str(item.saleParty) || item.saleQty || item.saleRate || str(item.destination);
+
+        // Loading = purchase but no sale; party = fromParty (SULPHURIC FROM column)
+        if (hasPurchase && !hasSale) {
+          const party = str(item.fromParty) || str(item.purchaseParty) || 'UNKNOWN';
+          if (!partyMap[party]) { partyMap[party] = { loading: [], unloading: [] }; partyOrder.push(party); }
+          const vehTail = extractNumberTail(item.vehicle);
+          const qty = (vehTail && qtyLookup[vehTail]) ? qtyLookup[vehTail] : (item.purchaseQty ? String(item.purchaseQty) : '');
+          const date = str(item.purchaseDate) && str(item.purchaseDate) !== '—' ? str(item.purchaseDate) : '';
+          partyMap[party].loading.push({ vehicle: item.vehicle, date: date, qty: qty });
+        }
+
+        // Unloading = only vehicles whose NEITHER purchase NOR sale has happened
+        if (!hasPurchase && !hasSale) {
+          const party = str(item.fromParty) || str(item.purchaseParty) || 'UNKNOWN';
+          if (!partyMap[party]) { partyMap[party] = { loading: [], unloading: [] }; partyOrder.push(party); }
+          const vehTail = extractNumberTail(item.vehicle);
+          const qty = (vehTail && qtyLookup[vehTail]) ? qtyLookup[vehTail] : (item.purchaseQty ? String(item.purchaseQty) : '');
+          const date = str(item.purchaseDate) && str(item.purchaseDate) !== '—' ? str(item.purchaseDate) : '';
+          partyMap[party].unloading.push({ vehicle: item.vehicle, date: date, qty: qty });
+        }
+      });
+
+      if (partyOrder.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      let html = '';
+      partyOrder.forEach(function (party) {
+        const p = partyMap[party];
+        const maxRows = Math.max(p.loading.length, p.unloading.length, 1);
+        for (let i = 0; i < maxRows; i++) {
+          const load = p.loading[i];
+          const unload = p.unloading[i];
+          const partyCell = (i === 0) ? '<span class="party-name" style="font-weight:700;">' + party + '</span>' : '';
+          const loadVeh = load ? (load.vehicle + (load.date ? ' ' + load.date : '')) : '—';
+          const loadQty = load ? (load.qty || '—') : '—';
+          const unloadVeh = unload ? (unload.vehicle + (unload.date ? ' ' + unload.date : '')) : '—';
+          const unloadQty = unload ? (unload.qty || '—') : '—';
+          const rowStyle = (i === maxRows - 1) ? ' style="border-bottom:2px solid #dce4ed;"' : '';
+          html += '<tr' + rowStyle + '>' +
+            '<td>' + partyCell + '</td>' +
+            '<td class="qty-rate">' + loadVeh + '</td>' +
+            '<td class="qty-rate">' + loadQty + '</td>' +
+            '<td class="qty-rate">' + unloadVeh + '</td>' +
+            '<td class="qty-rate">' + unloadQty + '</td>' +
+            '</tr>';
+        }
+      });
+      tbody.innerHTML = html;
+      section.style.display = 'block';
+    }
+
+    // ===== TODAY-ONLY DAYBOOK PROCESSING =====
+    // User uploads ONLY today's DayBook + today's SULPHURIC file.
+    // Previous data is never stored. Only the last Purchase and last Sale vehicle
+    // numbers are stored locally and used as boundaries on the next day.
+    function findLastVehicleInRaw(rawRows, type) {
+      const meta = getVehicleColumnAndHeader(rawRows);
+      if (meta.vehIdx === -1 && meta.narrationIdx === -1) return '';
+      const actualDestIdx = findCol((rawRows[meta.headerRow] || []).map(str), ['dest','destination','place','city','consign'], ['total']);
+      for (let r = rawRows.length - 1; r > meta.headerRow; r--) {
+        if (!isValidDayBookDataRow(rawRows[r], meta.vehIdx, meta.headerRow, r, meta.narrationIdx)) continue;
+        const row = rawRows[r] || [];
+        const vehicle = getVehicleFromRow(row, meta);
+        const hasDest = actualDestIdx !== -1 && str(row[actualDestIdx]);
+        const isSale = !!hasDest;
+        if ((type === 'sale' && isSale) || (type === 'purchase' && !isSale)) return vehicle;
+      }
+      return '';
+    }
+
+    function boundaryRowForType(rawRows, vehicle, type, separateSheet) {
+      if (!vehicle) return null;
+      const meta = getVehicleColumnAndHeader(rawRows);
+      if (meta.vehIdx === -1 && meta.narrationIdx === -1) return null;
+      const headers = (rawRows[meta.headerRow] || []).map(str);
+      const destIdx = findCol(headers, ['dest','destination','place','city','consign'], ['total']);
+      const target = extractNumberTail(vehicle) || normVeh(vehicle);
+      for (let r = rawRows.length - 1; r > meta.headerRow; r--) {
+        if (!isValidDayBookDataRow(rawRows[r], meta.vehIdx, meta.headerRow, r, meta.narrationIdx)) continue;
+        const row = rawRows[r] || [];
+        // Purchase and Sale are separate sheets in the normal DayBook export, so the
+        // sheet itself defines the type. Only use Destination to classify rows when
+        // a single-sheet DayBook is supplied.
+        if (!separateSheet) {
+          const hasDest = destIdx !== -1 && str(row[destIdx]);
+          const isSale = !!hasDest;
+          if ((type === 'sale' && !isSale) || (type === 'purchase' && isSale)) continue;
+        }
+        const current = str(row[meta.vehIdx]);
+        if (normVeh(current) === normVeh(vehicle) || (target && extractNumberTail(current) === target)) {
+          return { rowIndex: r, vehicle: current };
+        }
+      }
+      return null;
+    }
+
+    function sliceRegisterAfterBoundary(rawRows, savedVehicle, type, separateSheet) {
+      const meta = getVehicleColumnAndHeader(rawRows);
+      if (meta.vehIdx === -1) return [];
+      if (!savedVehicle) return parseRegisterSheet(rawRows);
+      const boundary = boundaryRowForType(rawRows, savedVehicle, type, separateSheet);
+      if (!boundary) {
+        return [];
+      }
+      const header = rawRows.slice(0, meta.headerRow + 1);
+      const rowsAfter = rawRows.slice(boundary.rowIndex + 1);
+      return parseRegisterSheet(header.concat(rowsAfter));
+    }
+
+    function parseTodayDayBook(workbook, savedState) {
+      const sheets = findDayBookSheets(workbook);
+      let pArr = [], sArr = [], details = [];
+
+      if (sheets.purchase && sheets.sale && sheets.purchase !== sheets.sale) {
+        const pRaw = getRawSheet(workbook, sheets.purchase);
+        const sRaw = getRawSheet(workbook, sheets.sale);
+        const pBoundary = savedState && savedState.lastPurchaseVehicle ? savedState.lastPurchaseVehicle : '';
+        const sBoundary = savedState && savedState.lastSaleVehicle ? savedState.lastSaleVehicle : '';
+        pArr = sliceRegisterAfterBoundary(pRaw, pBoundary, 'purchase', true);
+        sArr = sliceRegisterAfterBoundary(sRaw, sBoundary, 'sale', true);
+        details.push('Purchase: ' + (pBoundary ? 'after ' + pBoundary : 'full current file') + ' → ' + pArr.length + ' records');
+        details.push('Sale: ' + (sBoundary ? 'after ' + sBoundary : 'full current file') + ' → ' + sArr.length + ' records');
+      } else {
+        // Single-sheet DayBook fallback.
+        const name = workbook.SheetNames[0];
+        const raw = getRawSheet(workbook, name);
+        const pBoundary = savedState && savedState.lastPurchaseVehicle ? savedState.lastPurchaseVehicle : '';
+        const sBoundary = savedState && savedState.lastSaleVehicle ? savedState.lastSaleVehicle : '';
+        pArr = sliceRegisterAfterBoundary(raw, pBoundary, 'purchase', false);
+        sArr = sliceRegisterAfterBoundary(raw, sBoundary, 'sale', false);
+        // Avoid accidental duplication when a single-sheet export cannot separate purchase/sale rows.
+        if (!findCol((raw[getVehicleColumnAndHeader(raw).headerRow] || []).map(str), ['dest','destination','place','city','consign'], ['total'])) {
+          sArr = [];
+        }
+        details.push('DayBook: ' + name + ' → Purchase ' + pArr.length + ', Sale ' + sArr.length + ' records');
+      }
+
+      return {
+        merged: mergeRegisterArrays(pArr, sArr),
+        source: workbook.SheetNames.join(' + '),
+        details: details,
+        lastPurchaseVehicle: findLastVehicleInRaw(sheets.purchase ? getRawSheet(workbook, sheets.purchase) : getRawSheet(workbook, workbook.SheetNames[0]), 'purchase'),
+        lastSaleVehicle: findLastVehicleInRaw(sheets.sale ? getRawSheet(workbook, sheets.sale) : getRawSheet(workbook, workbook.SheetNames[0]), 'sale')
+      };
+    }
+
+    async function processTodayFiles(dayBookFile, dayBookWb, sulphuricFile, sulphuricWb) {
+      const box = document.getElementById('boxTodayPair');
+      const status = document.getElementById('statusDayBook');
+      const fileList = document.getElementById('todayPairList');
+      try {
+        const sul = parseSulphuric(sulphuricWb);
+        if (!sul || !sul.entries || !sul.entries.length) throw new Error('Current SULPHURIC RSN + VEH columns not found');
+
+        rsnData = sul.entries;
+        file1Name = sulphuricFile.name + ' (Current SULPHURIC)';
+
+        const saved = await getSavedDayBookBoundaries();
+        const today = parseTodayDayBook(dayBookWb, saved);
+        registerData = today.merged || [];
+
+        const filterInfo = filterRegisterToCurrentSulphuric();
+        file2Name = dayBookFile.name + ' (Today — after saved boundaries)';
+
+        if (box) box.classList.remove('error');
+        if (box) box.classList.add('loaded');
+        if (status) {
+          status.className = 'upload-status-text ok';
+          status.innerHTML = '<i class="fas fa-check-circle"></i> Today processed — new DayBook data filtered to current SULPHURIC vehicles';
+        }
+
+        if (fileList) {
+          fileList.innerHTML = today.details.map(function(d) {
+            return '<div style="font-size:0.78rem;color:#1f7b4d;background:#f0faf3;padding:0.3rem 0.8rem;border-radius:8px;">✓ ' + d + '</div>';
+          }).join('') +
+          '<div style="font-size:0.78rem;font-weight:700;color:#1d6bc3;background:#eef4fc;padding:0.3rem 0.8rem;border-radius:8px;margin-top:0.2rem;">CURRENT SULPHURIC FILTER: ' + filterInfo.after + ' of ' + filterInfo.before + ' records</div>';
+        }
+
+        generateReport();
+
+        // ONLY these two boundary values are persisted.
+        await saveLastDayBookBoundaries(today.lastPurchaseVehicle, today.lastSaleVehicle, dayBookFile.name);
+        showSavedDataStatus('Saved ONLY last DayBook vehicles — Purchase: ' + (today.lastPurchaseVehicle || '—') + ' | Sale: ' + (today.lastSaleVehicle || '—'), true);
+      } catch (err) {
+        console.error(err);
+        if (box) {
+          box.classList.remove('loaded');
+          box.classList.add('error');
+        }
+        if (status) {
+          status.className = 'upload-status-text err';
+          status.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + str(err && err.message ? err.message : err);
+        }
+      }
+    }
+
+    // ===== TODAY DAYBOOK + CURRENT SULPHURIC HANDLER (2 FILES AT ONCE) =====
+    let pendingDayBook = null;
+    let pendingSulphuric = null;
+
+    function readWorkbookFile(file) {
+      return new Promise(function(resolve, reject) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          try { resolve(XLSX.read(new Uint8Array(ev.target.result), {type:'array', cellDates:false})); }
+          catch (err) { reject(err); }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    async function processTodayPair(files) {
+      const box = document.getElementById('boxTodayPair');
+      const status = document.getElementById('statusDayBook');
+      const sulStatus = document.getElementById('statusSulphuricCurrent');
+      const list = document.getElementById('todayPairList');
+      const nameEl = document.getElementById('fileNameTodayPair');
+      box.classList.remove('loaded','error');
+      list.innerHTML = '';
+
+      if (files.length !== 2) {
+        pendingDayBook = null; pendingSulphuric = null;
+        nameEl.textContent = 'Select exactly 2 Excel files';
+        box.classList.add('error');
+        status.className = 'upload-status-text err';
+        status.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please select exactly 2 files — one DayBook and one SULPHURIC.';
+        return;
+      }
+
+      try {
+        status.className = 'upload-status-text wait';
+        status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reading both files and detecting their type...';
+        sulStatus.className = 'upload-status-text wait';
+        sulStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting current SULPHURIC...';
+
+        const parsed = [];
+        for (const file of files) {
+          const wb = await readWorkbookFile(file);
+          let day = null, sul = null;
+          try { day = parseDayBook(wb); } catch(e) {}
+          try { sul = parseSulphuric(wb); } catch(e) {}
+          parsed.push({file, wb, day, sul});
+        }
+
+        // Automatically identify: SULPHURIC has RSN + VEH pairs; DayBook has register data.
+        const sulObj = parsed.find(x => x.sul && x.sul.entries && x.sul.entries.length);
+        const dayObj = parsed.find(x => x !== sulObj && x.day && x.day.merged && x.day.merged.length);
+        if (!sulObj || !dayObj) {
+          throw new Error('Could not automatically identify both files. Please select one DayBook and one SULPHURIC Excel file.');
+        }
+
+        pendingDayBook = { file: dayObj.file, wb: dayObj.wb };
+        pendingSulphuric = { file: sulObj.file, wb: sulObj.wb };
+        nameEl.textContent = '2 files selected';
+        list.innerHTML =
+          '<div style="font-size:0.8rem;font-weight:600;color:#1f3a52;background:#f5f8fc;border:1px solid #dce6f0;padding:0.45rem 0.75rem;border-radius:10px;">' +
+          '<i class="fas fa-book" style="color:#1d6bc3;margin-right:6px;"></i> DayBook: <b>' + str(dayObj.file.name) + '</b></div>' +
+          '<div style="font-size:0.8rem;font-weight:600;color:#1f3a52;background:#f5faf6;border:1px solid #d5e8dc;padding:0.45rem 0.75rem;border-radius:10px;">' +
+          '<i class="fas fa-truck" style="color:#1f7b4d;margin-right:6px;"></i> SULPHURIC: <b>' + str(sulObj.file.name) + '</b> (' + sulObj.sul.entries.length + ' vehicles)</div>';
+
+        box.classList.add('loaded');
+        status.className = 'upload-status-text ok';
+        status.innerHTML = '<i class="fas fa-check-circle"></i> DayBook detected automatically — processing today new Purchase/Sale data...';
+        sulStatus.className = 'upload-status-text ok';
+        sulStatus.innerHTML = '<i class="fas fa-check-circle"></i> Current SULPHURIC detected automatically — ' + sulObj.sul.entries.length + ' current vehicles';
+
+        await processTodayFiles(pendingDayBook.file, pendingDayBook.wb, pendingSulphuric.file, pendingSulphuric.wb);
+      } catch (err) {
+        pendingDayBook = null; pendingSulphuric = null;
+        box.classList.add('error');
+        status.className = 'upload-status-text err';
+        status.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + str(err.message || err);
+        sulStatus.className = 'upload-status-text err';
+        sulStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> File detection failed';
+      }
+    }
+
+    document.getElementById('fileTodayPair').addEventListener('change', async function(e) {
+      const files = Array.from(e.target.files || []);
+      await processTodayPair(files);
+      // Allow selecting the same two files again later.
+      e.target.value = '';
+    });
+
+    // ===== MANUAL VEHICLE CHECK =====
+    // Check if a vehicle (by last digits) already has purchase or sale in the report.
+    // If neither purchase nor sale found, add it to the manual copy list.
+    // Supports multiple numbers separated by space, comma, or new-line.
+    // Date = yesterday's date in "D MMM YYYY" format (e.g. "2 Sep 2026")
+    function yesterdayDateStr() {
+      var d = new Date();
+      d.setDate(d.getDate() - 1);
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    function checkAndAddManual() {
+      const input = document.getElementById('manualVehInput');
+      const statusEl = document.getElementById('manualCheckStatus');
+
+      if (lastReportData.length === 0) {
+        statusEl.style.color = '#b15341';
+        statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Generate report first';
+        return;
+      }
+
+      // Split the input by space, comma, or new-line; extract all digit groups
+      const rawText = str(input.value);
+      if (!rawText) {
+        statusEl.style.color = '#b15341';
+        statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter digits';
+        return;
+      }
+      // Extract all digit sequences (handles spaces, commas, new-lines)
+      var rawGroups = rawText.match(/\d+/g) || [];
+      if (rawGroups.length === 0) {
+        statusEl.style.color = '#b15341';
+        statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> No digits found';
+        return;
+      }
+      // Split any digit group longer than 4 into chunks of 4
+      // e.g. "826692667166" → ["8266","9266","7166"]
+      const digitGroups = [];
+      rawGroups.forEach(function(g) {
+        if (g.length <= 4) {
+          digitGroups.push(g);
+        } else {
+          // Take last 4 digits of any leftover, rest in chunks of 4
+          for (var i = 0; i < g.length; i += 4) {
+            digitGroups.push(g.substring(i, i + 4));
+          }
+        }
+      });
+
+      // Build a lookup from report data: numberTail -> item
+      const reportByTail = {};
+      for (let i = 0; i < lastReportData.length; i++) {
+        const tail = extractNumberTail(lastReportData[i].vehicle);
+        if (tail && !reportByTail[tail]) reportByTail[tail] = lastReportData[i];
+      }
+
+      // Track results for summary message
+      let addedCount = 0;
+      let skippedPurOrSale = 0;
+      let alreadyInList = 0;
+      const addedVehicles = [];
+
+      digitGroups.forEach(function(digits) {
+        const inputTail = digits.replace(/^0+/, '');
+
+        // Check if already in manual list
+        const alreadyAdded = manualAdded.some(function(m) {
+          return extractNumberTail(m.vehicle) === inputTail;
+        });
+        if (alreadyAdded) {
+          alreadyInList++;
+          return;
+        }
+
+        const foundItem = reportByTail[inputTail] || null;
+
+        if (!foundItem) {
+          // Vehicle not in report at all — neither purchase nor sale. Add it.
+          manualAdded.push({ vehicle: digits, date: yesterdayDateStr() });
+          addedCount++;
+          addedVehicles.push(digits);
+        } else {
+          // Vehicle IS in report. Check if it has purchase or sale.
+          const hasPurchase = foundItem.matched && (foundItem.purchaseQty !== null || foundItem.purchaseRate !== null);
+          const hasSale = str(foundItem.saleParty) || foundItem.saleQty || foundItem.saleRate || str(foundItem.destination);
+          if (hasPurchase || hasSale) {
+            skippedPurOrSale++;
+          } else {
+            manualAdded.push({ vehicle: foundItem.vehicle, date: yesterdayDateStr() });
+            addedCount++;
+            addedVehicles.push(foundItem.vehicle);
+          }
+        }
+      });
+
+      updateManualCard();
+      
+
+      // Build summary status message
+      let parts = [];
+      if (addedCount > 0) {
+        parts.push('<span style="color:#1f7b4d;"><i class="fas fa-check-circle"></i> ' + addedCount + ' added: ' + addedVehicles.join(', ') + '</span>');
+      }
+      if (skippedPurOrSale > 0) {
+        parts.push('<span style="color:#b15341;"><i class="fas fa-times-circle"></i> ' + skippedPurOrSale + ' skipped (purchase/sale found)</span>');
+      }
+      if (alreadyInList > 0) {
+        parts.push('<span style="color:#d97706;"><i class="fas fa-info-circle"></i> ' + alreadyInList + ' already in list</span>');
+      }
+      if (parts.length === 0) {
+        parts.push('<span style="color:#b15341;"><i class="fas fa-exclamation-circle"></i> Nothing to add</span>');
+      }
+      statusEl.innerHTML = parts.join(' &nbsp;|&nbsp; ');
+
+      input.value = '';
+      input.focus();
+    }
+
+    function updateManualCard() {
+      const card = document.getElementById('copyManualCard');
+      const countEl = document.getElementById('copyManualCount');
+      if (manualAdded.length > 0) {
+        countEl.textContent = manualAdded.length;
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    // ===== COPY ALL MANUALLY ADDED VEHICLES =====
+    function copyAllManual() {
+      const card = document.getElementById('copyManualCard');
+      if (manualAdded.length === 0) return;
+      const lines = manualAdded.map(function (e) {
+        return e.date ? e.vehicle + '\t' + e.date : e.vehicle;
+      });
+      const text = lines.join('\n');
+      const done = function () {
+        const orig = card.innerHTML;
+        card.style.background = '#1f7b4d';
+        card.innerHTML = '<i class="fas fa-check" style="color:white;"></i><div><div class="stat-label" style="color:#d0f0e0;">Copied!</div><div class="stat-value" style="color:white;">' + manualAdded.length + '</div></div>';
+        setTimeout(function () { card.style.background = '#7a3fb0'; card.innerHTML = orig; }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, null, done); });
+      } else {
+        fallbackCopy(text, null, done);
+      }
+    }
+
+    // ===== PRINT =====
+    function printReport() {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      const hh12 = String(((hh % 12) || 12)).padStart(2, '0');
+      document.getElementById('dateTimeLabel').textContent = dd + '-' + mm + '-' + yyyy + ' ' + hh12 + ':' + min + ' ' + ampm;
+      window.print();
+    }
+
+    function fallbackCopy(text, btn, done) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    // ===== COPY ALL UNDERLINED VEHICLES (purchase only, no sale) =====
+    function copyAllUnderlined() {
+      const card = document.getElementById('copyAllCard');
+      // Collect from currently rendered table rows — find underlined spans (purchase-only, no box)
+      const rows = document.querySelectorAll('#tableBody tr');
+      const entries = [];
+      rows.forEach(function (tr) {
+        // Purchase-only vehicles are rendered as <span style="text-decoration: underline;...">
+        const spans = tr.querySelectorAll('td:nth-child(2) span');
+        let foundVehicle = false;
+        spans.forEach(function (sp) {
+          if (sp.style.textDecoration && sp.style.textDecoration.indexOf('underline') !== -1) {
+            const v = str(sp.textContent);
+            if (v) {
+              // Get purchase date from 3rd column
+              const dateCell = tr.children[2];
+              const date = dateCell ? str(dateCell.textContent) : '';
+              entries.push({ vehicle: v, date: (date && date !== '—') ? date : '' });
+              foundVehicle = true;
+            }
+          }
+        });
+      });
+      if (entries.length === 0) return;
+      const lines = entries.map(function (e) {
+        return e.date ? e.vehicle + '\t' + e.date : e.vehicle;
+      });
+      const text = lines.join('\n');
+      const done = function () {
+        const orig = card.innerHTML;
+        card.style.background = '#1f7b4d';
+        card.innerHTML = '<i class="fas fa-check" style="color:white;"></i><div><div class="stat-label" style="color:#d0f0e0;">Copied!</div><div class="stat-value" style="color:white;">' + entries.length + '</div></div>';
+        setTimeout(function () { card.style.background = '#1d6bc3'; card.innerHTML = orig; }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, null, done); });
+      } else {
+        fallbackCopy(text, null, done);
+      }
+    }
+
+    // ===== COPY ALL SOLD VEHICLES (vehicles that have sale data — shown in box) =====
+    function copyAllCompleted() {
+      const card = document.getElementById('copyCompletedCard');
+      // Sold vehicles are rendered with .vehicle-code class (in a box)
+      const rows = document.querySelectorAll('#tableBody tr');
+      const entries = [];
+      rows.forEach(function (tr) {
+        const vc = tr.querySelector('.vehicle-code');
+        if (!vc) return;
+        const v = str(vc.textContent);
+        if (!v) return;
+        // Get purchase date from 3rd column
+        const dateCell = tr.children[2];
+        const date = dateCell ? str(dateCell.textContent) : '';
+        entries.push({ vehicle: v, date: (date && date !== '—') ? date : '' });
+      });
+      if (entries.length === 0) return;
+      const lines = entries.map(function (e) {
+        return e.date ? e.vehicle + '\t' + e.date : e.vehicle;
+      });
+      const text = lines.join('\n');
+      const done = function () {
+        const orig = card.innerHTML;
+        card.style.background = '#1557a0';
+        card.innerHTML = '<i class="fas fa-check" style="color:white;"></i><div><div class="stat-label" style="color:#d0e3f7;">Copied!</div><div class="stat-value" style="color:white;">' + entries.length + '</div></div>';
+        setTimeout(function () { card.style.background = '#1f7b4d'; card.innerHTML = orig; }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, null, done); });
+      } else {
+        fallbackCopy(text, null, done);
+      }
+    }
+  </script>
+</body>
+</html>
