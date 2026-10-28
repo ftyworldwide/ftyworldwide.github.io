@@ -3241,6 +3241,7 @@ else directorInit();
   }, window.FTY_CONFIG || {});
 
   var STORE_KEY = 'fty_access_v1';
+  var PENDING_KEY = 'fty_pending_v1';
   var $ = function (id) { return document.getElementById(id); };
   var pending = null, busy = false, poll = null, fallback = null;
 
@@ -3258,6 +3259,7 @@ else directorInit();
 
   /* ── storage ── */
   function readStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return null; } }
+  function readPending() { try { return JSON.parse(localStorage.getItem(PENDING_KEY) || 'null'); } catch (e) { return null; } }
   function writeStore(o) { try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {} }
 
   /* ── app chalu karo (script ab tak nahi chala tha) ── */
@@ -3272,6 +3274,7 @@ else directorInit();
 
   function unlock(info) {
     writeStore(info);
+    try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
     stopWatch();
     document.body.classList.remove('fty-locked');
     var g = $('ftyGate');
@@ -3295,6 +3298,15 @@ else directorInit();
     return { email: email, mobile: mobile };
   }
 
+  /* ── prefilled payment page URL ── */
+  function buildUrl(f) {
+    var u = CFG.PAYMENT_PAGE_URL;
+    var q = 'amount=' + encodeURIComponent(CFG.PRICE_PAISE) +
+            '&email=' + encodeURIComponent(f.email) +
+            '&phone=' + encodeURIComponent(f.mobile);
+    return u + (u.indexOf('?') > -1 ? '&' : '?') + q;
+  }
+
   /* ── checkout sheet ── */
   function openSheet(f) {
     pending = f;
@@ -3302,13 +3314,18 @@ else directorInit();
     var sheet = $('gSheet'), frame = $('gFrame');
     if (!sheet || !frame) { showErr('Checkout load nahi hua. Page refresh kijiye.'); return; }
 
-    $('gSheetNew').href = CFG.PAYMENT_PAGE_URL;
+    /* email + mobile Razorpay page me pehle se bhar do — dobara type nahi karna padega */
+    var url = buildUrl(f);
+
+    try { localStorage.setItem(PENDING_KEY, JSON.stringify(f)); } catch (e) {}
+
+    $('gSheetNew').href = url;
     $('gSheetPaid').hidden = true;
     $('gSheetHint').textContent = 'Payment isi page par — koi redirect nahi.';
     sheet.hidden = false;
     setBusy(true, 'Checkout khul raha hai…');
 
-    try { frame.src = CFG.PAYMENT_PAGE_URL; } catch (e) {}
+    try { frame.src = url; } catch (e) {}
 
     frame.onload = function () { setBusy(false); };
 
@@ -3336,17 +3353,17 @@ else directorInit();
         }
       }
 
-      /* 25s baad manual button dikha do */
-      if (Date.now() - started > 25000) {
+      /* 8s baad manual button dikha do */
+      if (Date.now() - started > 8000) {
         var b = $('gSheetPaid');
-        if (b) { b.hidden = false; $('gSheetHint').textContent = 'Payment ho gaya? Neeche button dabaiye.'; }
+        if (b && b.hidden) { b.hidden = false; $('gSheetHint').textContent = 'Payment ho gaya? Yahan dabaiye →'; }
       }
     }, 700);
 
     fallback = setTimeout(function () {
       var b = $('gSheetPaid');
-      if (b) { b.hidden = false; }
-    }, 25000);
+      if (b) { b.hidden = false; $('gSheetHint').textContent = 'Payment ho gaya? Yahan dabaiye →'; }
+    }, 8000);
   }
 
   function stopWatch() {
@@ -3393,6 +3410,33 @@ else directorInit();
   /* ── boot ── */
   function init() {
     var g = $('ftyGate');
+
+    /* ── Razorpay redirect ke params (yahi page callback URL hai) ── */
+    var q = null;
+    try { q = new URLSearchParams(location.search); } catch (e) { q = null; }
+    var payId = q ? (q.get('razorpay_payment_id') || q.get('razorpay_payment_link_id') || q.get('paid')) : null;
+    var st = q ? (q.get('razorpay_payment_link_status') || '') : '';
+    var paidOk = !!payId && (!st || st.toLowerCase() === 'paid' || st.toLowerCase() === 'captured');
+
+    /* iframe ke andar khula hai (checkout ke andar callback)? bas parent ko signal do */
+    if (paidOk && window.self !== window.top) {
+      try {
+        window.parent.postMessage({ type: 'fty-paid', paymentId: payId }, '*');
+        window.parent.postMessage('fty-paid', '*');
+      } catch (e) {}
+      return;
+    }
+
+    /* poore tab me redirect aaya hai? turant access do */
+    if (paidOk && g) {
+      var pend = readPending();
+      if (pend && pend.email && pend.mobile) {
+        try { history.replaceState({}, '', location.pathname); } catch (e) {}
+        unlock({ email: pend.email, mobile: pend.mobile, paymentId: payId, at: Date.now(), via: 'callback' });
+        return;
+      }
+    }
+
     if (!g) { document.body.classList.remove('fty-locked'); runApp(); return; }
 
     var saved = readStore();
