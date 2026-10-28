@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <!-- ══════════════════════════════════════════════════════════════════
-     YAHAN APNI RAZORPAY KEY DAALO — sirf ye ek line badalni hai
-     Razorpay Dashboard → Account & Settings → API Keys → Generate Key
-     Test key: rzp_test_...   |   Live key: rzp_live_...
+     FTY CONFIG — sirf ye 2 line kabhi badalni ho to badlo
+     PAYMENT_PAGE_URL = tumhara Razorpay Payment Page ka link
+     PRICE_PAISE      = 100 matlab ₹1
      ══════════════════════════════════════════════════════════════════ -->
 <script>
 window.FTY_CONFIG = {
-  RAZORPAY_KEY_ID: 'rzp_test_XXXXXXXXXXXXXX',
+  PAYMENT_PAGE_URL: 'https://pages.razorpay.com/pl_TtEG7jUoC2nTH1/view',
   PRICE_PAISE: 100,
   PRODUCT_NAME: 'FTY Scanner — Full Access'
 };
@@ -700,6 +700,36 @@ body.fty-locked .wrap,body.fty-locked #boot,body.fty-locked>.aurora{display:none
 }
 @media(prefers-reduced-motion:reduce){#ftyGate *{animation:none!important;transition:none!important}}
 
+/* ── in-page checkout sheet (Razorpay Payment Page iframe) ── */
+#ftyGate .g-sheet{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;
+  padding:16px;background:rgba(2,4,10,.82);backdrop-filter:blur(7px);animation:gfade .2s ease}
+#ftyGate .g-sheet[hidden]{display:none}
+@keyframes gfade{from{opacity:0}to{opacity:1}}
+#ftyGate .g-sheet-box{width:min(460px,100%);height:min(720px,92vh);display:flex;flex-direction:column;
+  background:#0b1220;border:1px solid var(--g-line2);border-radius:18px;overflow:hidden;
+  box-shadow:0 40px 90px -30px #000;animation:gpop .24s cubic-bezier(.2,.9,.3,1.05)}
+@keyframes gpop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+#ftyGate .g-sheet-bar{display:flex;align-items:center;gap:10px;padding:11px 12px;background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--g-line);flex:0 0 auto}
+#ftyGate .g-sheet-t{flex:1;font-family:var(--g-fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--g-dim)}
+#ftyGate .g-sheet-a{font-family:var(--g-fm);font-size:10.5px;color:var(--g-faint);text-decoration:none;
+  border:1px solid var(--g-line);border-radius:99px;padding:4px 9px;white-space:nowrap}
+#ftyGate .g-sheet-a:hover{color:var(--g-lime);border-color:rgba(201,242,75,.4)}
+#ftyGate .g-sheet-x{background:none;border:0;color:var(--g-dim);font-size:15px;cursor:pointer;
+  line-height:1;padding:4px 6px;border-radius:7px}
+#ftyGate .g-sheet-x:hover{color:#fff;background:rgba(255,255,255,.07)}
+#ftyGate #gFrame{flex:1;width:100%;border:0;background:#fff;display:block}
+#ftyGate .g-sheet-foot{flex:0 0 auto;padding:9px 12px;border-top:1px solid var(--g-line);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.02)}
+#ftyGate #gSheetHint{font-family:var(--g-fm);font-size:10.5px;color:var(--g-faint);letter-spacing:.02em}
+#ftyGate .g-sheet-paid{background:rgba(201,242,75,.12);border:1px solid rgba(201,242,75,.42);color:var(--g-lime);
+  font-family:var(--g-fu);font-size:11.5px;font-weight:600;padding:7px 11px;border-radius:9px;cursor:pointer;white-space:nowrap}
+#ftyGate .g-sheet-paid:hover{background:rgba(201,242,75,.2)}
+@media(max-width:520px){
+  #ftyGate .g-sheet{padding:0}
+  #ftyGate .g-sheet-box{width:100%;height:100%;border-radius:0;border:0}
+}
+
 </style>
 </head>
 <body class="fty-locked">
@@ -785,6 +815,22 @@ body.fty-locked .wrap,body.fty-locked #boot,body.fty-locked>.aurora{display:none
     <div class="g-foot">
       <span>© FTY SCANNER · Educational tool, not investment advice</span>
       <span id="gPid"></span>
+    </div>
+  </div>
+
+  <!-- in-page checkout (Razorpay Payment Page iframe) -->
+  <div class="g-sheet" id="gSheet" hidden>
+    <div class="g-sheet-box">
+      <div class="g-sheet-bar">
+        <span class="g-sheet-t">Razorpay · Secure checkout</span>
+        <a class="g-sheet-a" id="gSheetNew" href="#" target="_blank" rel="noopener">↗ naya tab</a>
+        <button class="g-sheet-x" id="gSheetX" type="button" aria-label="Close">✕</button>
+      </div>
+      <iframe id="gFrame" title="Razorpay checkout" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="g-sheet-foot">
+        <span id="gSheetHint">Payment isi page par — koi redirect nahi.</span>
+        <button class="g-sheet-paid" id="gSheetPaid" type="button" hidden>Payment ho gaya? Access lo</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3181,46 +3227,40 @@ else directorInit();
 </script>
 <script>
 /* ══════════════════════════════════════════════════════════════════════
-   FTY SCANNER — PAYWALL (single-file / HTML version)
-   ──────────────────────────────────────────────────────────────────────
-   ⚠️  YAHAN APNI RAZORPAY KEY DAALO  (line ~14)
-       Razorpay Dashboard → Account & Settings → API Keys
-       Test: rzp_test_...   |   Live: rzp_live_...
+   FTY SCANNER — PAYWALL (single-file HTML)
+   Checkout: Razorpay Payment Page, iframe ke andar — SAME PAGE.
+   Config file ke sabse upar <script> block me hai (window.FTY_CONFIG).
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  /* config file ke sabse upar wale <script> block me hai (window.FTY_CONFIG) */
   var CFG = Object.assign({
-    RAZORPAY_KEY_ID: '',
+    PAYMENT_PAGE_URL: 'https://pages.razorpay.com/pl_TtEG7jUoC2nTH1/view',
     PRICE_PAISE: 100,
     PRODUCT_NAME: 'FTY Scanner — Full Access'
   }, window.FTY_CONFIG || {});
 
   var STORE_KEY = 'fty_access_v1';
   var $ = function (id) { return document.getElementById(id); };
-  var order = null, busy = false, rzpLoading = false;
+  var pending = null, busy = false, poll = null, fallback = null;
 
   function money(p) { return '₹' + Number(p / 100).toLocaleString('en-IN'); }
-  function showErr(m) { var e = $('gErr'); e.textContent = m; e.classList.add('on'); $('gOk').classList.remove('on'); }
-  function clearMsg() { $('gErr').classList.remove('on'); }
+  function showErr(m) { var e = $('gErr'); if (!e) return; e.textContent = m; e.classList.add('on'); $('gOk').classList.remove('on'); }
+  function clearMsg() { var e = $('gErr'); if (e) e.classList.remove('on'); }
   function setBusy(b, label) {
     busy = b;
     var btn = $('gPay');
+    if (!btn) return;
     btn.disabled = b;
     btn.classList.toggle('loading', b);
     $('gPayTxt').textContent = b ? (label || 'Please wait…') : ('Pay ' + money(CFG.PRICE_PAISE) + ' & Get Access');
   }
 
-  /* ── stored access ── */
-  function readStore() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return null; }
-  }
-  function writeStore(o) {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {}
-  }
+  /* ── storage ── */
+  function readStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return null; } }
+  function writeStore(o) { try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {} }
 
-  /* ── app ko chalu karo (script ab tak chalaya nahi gaya tha) ── */
+  /* ── app chalu karo (script ab tak nahi chala tha) ── */
   function runApp() {
     var src = document.getElementById('fty-app-src');
     if (!src) return;
@@ -3230,15 +3270,15 @@ else directorInit();
     src.remove();
   }
 
-  function unlock(info, instant) {
+  function unlock(info) {
     writeStore(info);
+    stopWatch();
     document.body.classList.remove('fty-locked');
     var g = $('ftyGate');
     if (!g) return;
-    if (instant) { g.remove(); runApp(); return; }
     $('gTag').textContent = 'Unlocked';
-    $('gOk').textContent = '✓ Payment successful! Access mil gaya — scanner khul raha hai…';
-    $('gOk').classList.add('on');
+    var ok = $('gOk');
+    if (ok) { ok.textContent = '✓ Payment successful! Access mil gaya — scanner khul raha hai…'; ok.classList.add('on'); }
     clearMsg();
     g.classList.add('g-out');
     setTimeout(function () { g.remove(); runApp(); }, 420);
@@ -3255,86 +3295,99 @@ else directorInit();
     return { email: email, mobile: mobile };
   }
 
-  /* ── Razorpay script load ── */
-  function loadRzp(cb) {
-    if (window.Razorpay) return cb();
-    if (rzpLoading) return;
-    rzpLoading = true;
-    var s = document.createElement('script');
-    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    s.onload = function () { rzpLoading = false; cb(); };
-    s.onerror = function () {
-      rzpLoading = false; setBusy(false);
-      showErr('Payment window load nahi hui. Internet check karke dobara try kijiye.');
-    };
-    document.body.appendChild(s);
+  /* ── checkout sheet ── */
+  function openSheet(f) {
+    pending = f;
+    clearMsg();
+    var sheet = $('gSheet'), frame = $('gFrame');
+    if (!sheet || !frame) { showErr('Checkout load nahi hua. Page refresh kijiye.'); return; }
+
+    $('gSheetNew').href = CFG.PAYMENT_PAGE_URL;
+    $('gSheetPaid').hidden = true;
+    $('gSheetHint').textContent = 'Payment isi page par — koi redirect nahi.';
+    sheet.hidden = false;
+    setBusy(true, 'Checkout khul raha hai…');
+
+    try { frame.src = CFG.PAYMENT_PAGE_URL; } catch (e) {}
+
+    frame.onload = function () { setBusy(false); };
+
+    /* 1) callback page ne message bheja */
+    /* 2) iframe apne hi domain ke callback page par pahunch gaya */
+    startWatch();
   }
 
-  /* ── pay ── */
+  function startWatch() {
+    stopWatch();
+    var started = Date.now();
+
+    poll = setInterval(function () {
+      var frame = $('gFrame');
+      if (!frame) return stopWatch();
+      var href = '';
+      try { href = frame.contentWindow.location.href || ''; } catch (e) { href = ''; /* abhi razorpay domain par hai */ }
+
+      if (href && href !== 'about:blank') {
+        if (href.indexOf('razorpay_payment_id') > -1 ||
+            href.indexOf('rsn-paid') > -1 ||
+            href.indexOf('paid=1') > -1) {
+          success();
+          return;
+        }
+      }
+
+      /* 25s baad manual button dikha do */
+      if (Date.now() - started > 25000) {
+        var b = $('gSheetPaid');
+        if (b) { b.hidden = false; $('gSheetHint').textContent = 'Payment ho gaya? Neeche button dabaiye.'; }
+      }
+    }, 700);
+
+    fallback = setTimeout(function () {
+      var b = $('gSheetPaid');
+      if (b) { b.hidden = false; }
+    }, 25000);
+  }
+
+  function stopWatch() {
+    if (poll) { clearInterval(poll); poll = null; }
+    if (fallback) { clearTimeout(fallback); fallback = null; }
+  }
+
+  function success() {
+    if (!pending) return;
+    var info = {
+      email: pending.email,
+      mobile: pending.mobile,
+      at: Date.now(),
+      via: 'payment-page'
+    };
+    closeSheet();
+    unlock(info);
+  }
+
+  function closeSheet() {
+    stopWatch();
+    var sheet = $('gSheet'), frame = $('gFrame');
+    if (sheet) sheet.hidden = true;
+    if (frame) { try { frame.src = 'about:blank'; } catch (e) {} }
+    setBusy(false);
+    pending = null;
+  }
+
+  /* ── pay / restore ── */
   function startPay() {
     if (busy) return;
-    clearMsg();
-
-    if (!CFG.RAZORPAY_KEY_ID || /XXXX/.test(CFG.RAZORPAY_KEY_ID)) {
-      return showErr('Razorpay key set nahi hai. File ke sabse upar FTY_CONFIG block me RAZORPAY_KEY_ID ki jagah apni key (rzp_test_... / rzp_live_...) daalo.');
-    }
     var f = readForm(); if (!f) return;
-
-    setBusy(true, 'Opening checkout…');
-    loadRzp(function () {
-      order = f;
-      var rz = new Razorpay({
-        key: CFG.RAZORPAY_KEY_ID,
-        amount: CFG.PRICE_PAISE,
-        currency: 'INR',
-        name: 'FTY Scanner',
-        description: CFG.PRODUCT_NAME,
-        prefill: { email: f.email, contact: '+91' + f.mobile },
-        notes: { email: f.email, mobile: f.mobile, product: CFG.PRODUCT_NAME },
-        theme: { color: '#c9f24b' },
-        modal: {
-          ondismiss: function () {
-            setBusy(false);
-            showErr('Payment cancel ho gaya. Aap dobara try kar sakte hain.');
-          }
-        },
-        handler: function (resp) {
-          setBusy(true, 'Confirming…');
-          unlock({
-            email: f.email,
-            mobile: f.mobile,
-            paymentId: resp.razorpay_payment_id || '',
-            amount: CFG.PRICE_PAISE,
-            at: Date.now()
-          });
-        }
-      });
-      rz.on('payment.failed', function (r) {
-        setBusy(false);
-        showErr('Payment fail hui: ' + ((r.error && r.error.description) || 'unknown error'));
-      });
-      try {
-        rz.open();
-        setTimeout(function () {
-          if (busy && !document.querySelector('iframe[src*="razorpay"]')) {
-            setBusy(false);
-            showErr('Checkout khul nahi paya. Internet check kijiye — aur agar file:// se khol rahe ho to use host karna zaroori hai.');
-          }
-        }, 4000);
-      } catch (e) { setBusy(false); showErr('Checkout khul nahi paya: ' + e.message); }
-    });
+    openSheet(f);
   }
 
-  /* ── restore ── */
   function restore() {
     clearMsg();
     var f = readForm(); if (!f) return;
     var s = readStore();
-    if (s && s.email === f.email && s.mobile === f.mobile) {
-      unlock(s, false);
-    } else {
-      showErr('Is email + mobile ka koi payment is device par nahi mila. Wahi email/mobile daaliye jisse payment kiya tha — ya support se contact kijiye.');
-    }
+    if (s && s.email === f.email && s.mobile === f.mobile) unlock(s);
+    else showErr('Is email + mobile ka koi payment is device par nahi mila. Wahi email/mobile daaliye jisse payment kiya tha — ya support se contact kijiye.');
   }
 
   /* ── boot ── */
@@ -3342,7 +3395,6 @@ else directorInit();
     var g = $('ftyGate');
     if (!g) { document.body.classList.remove('fty-locked'); runApp(); return; }
 
-    /* pehle se paid? seedha andar */
     var saved = readStore();
     if (saved && saved.email && saved.mobile) {
       document.body.classList.remove('fty-locked');
@@ -3354,11 +3406,11 @@ else directorInit();
     g.classList.add('g-ready');
 
     if (location.protocol === 'file:') {
-      showErr('Ye file double-click se khul rahi hai (file://). Razorpay checkout file:// par block ho jaata hai — ise kisi website par host karo (Netlify drop / GitHub Pages / apni domain), phir checkout isi page par khulega.');
+      showErr('Ye file double-click se khul rahi hai. Razorpay checkout file:// par nahi chalta — ise host karke (GitHub Pages / Netlify) kholo.');
     }
+
     $('gVal').textContent = (CFG.PRICE_PAISE / 100).toLocaleString('en-IN');
     $('gPayTxt').textContent = 'Pay ' + money(CFG.PRICE_PAISE) + ' & Get Access';
-    $('gTag2').textContent = /^rzp_live_/.test(CFG.RAZORPAY_KEY_ID) ? 'Live' : 'Instant';
 
     $('gMobile').addEventListener('input', function () {
       this.value = this.value.replace(/\D/g, '').slice(0, 10);
@@ -3368,12 +3420,25 @@ else directorInit();
     });
     $('gForm').addEventListener('submit', function (e) { e.preventDefault(); startPay(); });
     $('gRestore').addEventListener('click', restore);
+    $('gSheetX').addEventListener('click', closeSheet);
+    $('gSheetPaid').addEventListener('click', success);
 
-    /* devtools se gate hatane par bhi app na chale */
+    /* callback page se signal */
+    window.addEventListener('message', function (e) {
+      var d = e.data;
+      var isPaid = d === 'fty-paid' || (d && (d.type === 'fty-paid' || d.status === 'paid'));
+      if (!isPaid) return;
+      if (e.origin && location.origin && e.origin !== location.origin) return;
+      if (!pending) return;
+      success();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && $('gSheet') && !$('gSheet').hidden) closeSheet();
+    });
+
     new MutationObserver(function () {
-      if (!document.getElementById('ftyGate') && !readStore()) {
-        location.reload();
-      }
+      if (!document.getElementById('ftyGate') && !readStore()) location.reload();
     }).observe(document.body, { childList: true });
   }
 
